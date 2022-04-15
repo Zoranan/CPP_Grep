@@ -315,12 +315,7 @@ namespace rex
 	{
 
 	public:
-		GreedyQuantifier(Atom* a, unsigned int min, unsigned int max) : QuantifierBase(a, min, max)
-		{
-			_atom = a;
-			_min = min;
-			_max = max;
-		}
+		GreedyQuantifier(Atom* a, unsigned int min, unsigned int max) : QuantifierBase(a, min, max) { }
 
 		int try_match(Match& m, string& str, unsigned int start_pos) override
 		{
@@ -488,9 +483,6 @@ namespace rex
 
 				r = try_next(r, m, str, start_pos);
 			}
-
-			if (r == -1)
-				reset();
 			
 			return r;
 		}

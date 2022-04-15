@@ -126,6 +126,12 @@ namespace rex
 				tokOut.type = TokenType::LITERAL;
 				return false;
 
+			case 'f':
+				tokOut.originalText = "\\f";
+				tokOut.value = "\f";
+				tokOut.type = TokenType::LITERAL;
+				return false;
+
 				//META
 
 			case 'd':
