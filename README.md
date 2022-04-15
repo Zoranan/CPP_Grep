@@ -22,7 +22,7 @@ This is a WIP. Many features are likely broken. Any know broken features will be
 
 Capture groups are enclosed in parenthesis. If you don't want output to be captured, use (?: to start your group
 
-There is currently an issue when quantifiying capture groups with greedy quantifiers where the match will succeed, but output will not be captured.
+Capture groups are buggy still when quantified.
 
 - Each group can capture multiple values if it is quantified
 - Groups can be nested
@@ -35,3 +35,4 @@ There is currently an issue when quantifiying capture groups with greedy quantif
 - Automated testing should be created as well
 - Multiline and Singleline modes need to be implemented and tested
 - Case insensitive mode needs to be fixed for CharRange
+- Add some optimization to the parser to avoid generating a regex that double checks chars
