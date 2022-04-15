@@ -115,7 +115,7 @@ namespace rex
 		{
 			if (start_pos >= str.size())
 				return -1;
-
+			
 			char c = str[start_pos];
 			if (isalpha(c) && !_caseSensitive)
 				c = tolower(c);
@@ -347,7 +347,7 @@ namespace rex
 
 			// We found the most greedy match possible and met the minimum
 			// If we don't have a next, then return success
-			int fin = try_next(end_positions.top() - start_pos, m, str, end_positions.top());
+			int fin = try_next(end_positions.top() - start_pos, m, str, start_pos);	//NOTE: Always pass in the unmodified start position, because this method adds the current position to it!
 			
 			if (_next != NULLPTR)
 				while (fin == -1)

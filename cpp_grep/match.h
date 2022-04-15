@@ -66,7 +66,7 @@ namespace rex
 
 		void print_all_info(ostream &o)
 		{
-			o << "Whole Match (0): " << _value << endl;
+			o << "Whole Match (0): '" << _value << "'" << endl;
 			o << "      Starts At: " << _start << endl;
 			for (size_t i = 0; i < _groups.size(); i++)
 			{
@@ -75,7 +75,7 @@ namespace rex
 				{
 					Capture cap = _groups[i].get_capture(j);
 					o << "            Capture " << j << ": " << endl;
-					o << "                 Value: " << cap.value() << endl;
+					o << "                 Value: '" << cap.value() << "'" << endl;
 					o << "             Starts At: " << cap.start() << endl;
 				}
 			}
