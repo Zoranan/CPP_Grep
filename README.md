@@ -5,7 +5,7 @@ A regex library written in C++
 
 ## Features
 
-This is a WIP. Many features are likely broken. Any know broken features will be noted below.
+This is a WIP. Many features are likely broken. Any known broken features will be noted below.
 
 - Char classes (negated as well)
 - Branches (|)
@@ -13,9 +13,9 @@ This is a WIP. Many features are likely broken. Any know broken features will be
 - Capture (and non capturing) groups
 - Standard greedy and non-greedy quantifiers
 - Escape chars: \r \n \t \f
-- Special classes: \d \w \s
-- Beginning of line (^) <== Currently always in multiline mode
-- End of line ($) <== This isn't working right, specifically when used with lazy quantifiers. It forces the lazy quantifier to drag itself out until it reaches its max value or the end of line is reached.
+- Special classes: \d \w \s and \D \W \S
+- Beginning of line (^)	<== Currently always in multiline mode
+- End of line ($) 		<== This isn't working right, specifically when used with lazy quantifiers. It forces the lazy quantifier to drag itself out until it reaches its max value or the end of line is reached.
 
 
 ## Capture Groups
