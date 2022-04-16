@@ -42,7 +42,7 @@ namespace rex
 		string _value;
 
 	public:
-		Capture(size_t s = 0, string val = "")
+		Capture(size_t s = 0, string val = "") : CaptureBase(s)
 		{
 			_value = val;
 		}

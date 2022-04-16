@@ -161,17 +161,6 @@ namespace rex
 						break;
 					}
 
-					// None of the following types are valid in char classes, but the lexer shouldn't provide us with anything like that
-					//case TokenType::START_NEG_CHAR_CLASS:
-					//{
-					//	toks[i].type = TokenType::START_CHAR_CLASS;	//Set this so that nested parens are recognized
-					//	vector<Token> t = sub_seq(toks, i, TokenType::END_CHAR_CLASS, false);
-					//	if (t.empty())
-					//		continue;	//TODO: Ignore empty groups
-					//	next = new InversionAtom(parse_inner(t, caseSensitive, true, gNum));
-					//	break;
-					//}
-
 					case TokenType::START_GROUP:
 					{
 						vector<Token> t = sub_seq(toks, i, TokenType::END_GROUP, true);
@@ -208,16 +197,6 @@ namespace rex
 						}
 						break;
 					}
-
-					//case TokenType::START_GROUP_NO_CAP:
-					//{
-					//	toks[i].type = TokenType::START_GROUP;	//Set this so that nested parens are recognized
-					//	vector<Token> t = sub_seq(toks, i, TokenType::END_GROUP, true);
-					//	if (t.empty())
-					//		continue;	//TODO: Ignore empty groups
-					//	next = parse_inner(t, caseSensitive, false, gNum);
-					//	break;
-					//}
 
 					case TokenType::OR_OP:
 						lastWasOr = true;

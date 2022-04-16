@@ -595,6 +595,9 @@ namespace rex
 			try_capture(start_pos, 0);
 			return try_next(0, m, str, start_pos);
 		}
+
+		//TODO: I believe the ending DummyAtom is the reason for the extra empty capture at the end of quantified groups. 
+		//		Need to look into this more, it only happens with greedy quantifiers.
 	};
 
 	//////////////////////

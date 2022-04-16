@@ -180,14 +180,12 @@ namespace rex
 				string t(OPEN_CLASS_STR);
 				t.push_back('^');
 				tok.set_text(t);
-				//tok.type = TokenType::START_NEG_CHAR_CLASS;
 				i++;
 				isNeg = true;
 			}
 			else
 			{
 				tok.set_text(OPEN_CLASS_STR);
-				//tok.type = TokenType::START_CHAR_CLASS;
 			}
 
 			end_token(toks, tok);
