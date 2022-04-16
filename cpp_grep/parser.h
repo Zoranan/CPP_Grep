@@ -64,19 +64,17 @@ namespace rex
 
 		static Atom* get_special(Token tok)
 		{
-			bool invert = true;
+			bool invert = tok.value[1] >= 'A' && tok.value[1] <= 'Z';
 			Atom* special;
 
 			switch (tok.value[1])
 			{
 			case 'd':
-				invert = false;
 			case 'D':
 				special = new CharRange('0', '9', true);
 				break;
 
 			case 'w':
-				invert = false;
 			case 'W':
 			{
 				vector<Atom*> atoms;
@@ -89,7 +87,6 @@ namespace rex
 			}
 
 			case 's':
-				invert = false;
 			case 'S':
 			{
 				vector<Atom*> atoms;

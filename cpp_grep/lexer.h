@@ -155,12 +155,12 @@ namespace rex
 				return true;
 
 			case 's':
-				tokOut.set_text("\\w");
+				tokOut.set_text("\\s");
 				tokOut.type = TokenType::SPECIAL;
 				return true;
 
 			case 'S':
-				tokOut.set_text("\\W");
+				tokOut.set_text("\\S");
 				tokOut.type = TokenType::SPECIAL;
 				return true;
 
