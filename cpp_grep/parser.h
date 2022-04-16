@@ -36,22 +36,21 @@ namespace rex
 			i++;
 
 			//Make sure this isnt an empty set
-			if (i < master.size() && master[i].type == endsWith)
-				throw "Illegal empty pair at " + toStr(i - 1);
 
 			while (i < master.size())
-			{
-				sub.push_back(master[i]);
-				i++;
-
+			{	
 				if (master[i].type == startType)
 				{
 					balance++;
 				}
 				else if (master[i].type == endsWith && --balance == 0)
 				{
+					// Don't skip the closing paren, because the calling method will increment after this
 					break;
 				}
+
+				sub.push_back(master[i]);
+				i++;
 
 				if (!allowNesting && balance > 1)
 					throw "Illegal nested pair at " + toStr(i - 1);
@@ -146,38 +145,79 @@ namespace rex
 					case TokenType::SPECIAL:
 						next = get_special(tok);
 						break;
+
 					case TokenType::START_CHAR_CLASS:
 					{
 						vector<Token> t = sub_seq(toks, i, TokenType::END_CHAR_CLASS, false);
+						if (t.empty())
+							continue;	//Ignore empty char classes
+
 						next = parse_inner(t, caseSensitive, true, gNum);
+
+						//Check if this is inverted
+						if (tok.originalText.size() > 1 && tok.originalText[1] == '^')
+							next = new InversionAtom(next);
+
 						break;
 					}
 
 					// None of the following types are valid in char classes, but the lexer shouldn't provide us with anything like that
-					case TokenType::START_NEG_CHAR_CLASS:
-					{
-						toks[i].type = TokenType::START_CHAR_CLASS;	//Set this so that nested parens are recognized
-						vector<Token> t = sub_seq(toks, i, TokenType::END_CHAR_CLASS, false);
-						next = new InversionAtom(parse_inner(t, caseSensitive, true, gNum));
-						break;
-					}
+					//case TokenType::START_NEG_CHAR_CLASS:
+					//{
+					//	toks[i].type = TokenType::START_CHAR_CLASS;	//Set this so that nested parens are recognized
+					//	vector<Token> t = sub_seq(toks, i, TokenType::END_CHAR_CLASS, false);
+					//	if (t.empty())
+					//		continue;	//TODO: Ignore empty groups
+					//	next = new InversionAtom(parse_inner(t, caseSensitive, true, gNum));
+					//	break;
+					//}
 
 					case TokenType::START_GROUP:
 					{
 						vector<Token> t = sub_seq(toks, i, TokenType::END_GROUP, true);
-						unsigned short captureGroup = gNum;	//Store off our capture group before it gets incremented
-						next = parse_inner(t, caseSensitive, false, ++gNum);	//Increment the gNum before we pass it in
-						next->assign_group(captureGroup);
+						
+						//Check if this is a non-capturing group
+						if (tok.originalText.length() == 3 && tok.originalText[1] == '?' && tok.originalText[2] == ':')
+						{
+							if (t.empty())
+								continue;	//Ignore empty non-capturing groups
+							next = parse_inner(t, caseSensitive, false, gNum);
+						}
+
+						//This is a capturing group
+						else 
+						{
+							unsigned short captureGroup = gNum;	//Store off our capture group before it gets incremented
+							gNum++;
+
+							if (t.empty())
+							{
+								//If this is an empty group, we will keep it just to preserve the group numbering
+								next = new DummyAtom();	//TODO: Maybe warn the user in stderr
+							}
+							else
+							{
+								next = parse_inner(t, caseSensitive, false, gNum);
+
+								// We must append start and end dummy atoms to make sure each nested group has a unique start and end atom
+								next = new DummyAtom(next);
+								next->append(new DummyAtom());
+							}
+
+							next->assign_group(captureGroup);
+						}
 						break;
 					}
 
-					case TokenType::START_GROUP_NO_CAP:
-					{
-						toks[i].type = TokenType::START_GROUP;	//Set this so that nested parens are recognized
-						vector<Token> t = sub_seq(toks, i, TokenType::END_GROUP, true);
-						next = parse_inner(t, caseSensitive, false, gNum);
-						break;
-					}
+					//case TokenType::START_GROUP_NO_CAP:
+					//{
+					//	toks[i].type = TokenType::START_GROUP;	//Set this so that nested parens are recognized
+					//	vector<Token> t = sub_seq(toks, i, TokenType::END_GROUP, true);
+					//	if (t.empty())
+					//		continue;	//TODO: Ignore empty groups
+					//	next = parse_inner(t, caseSensitive, false, gNum);
+					//	break;
+					//}
 
 					case TokenType::OR_OP:
 						lastWasOr = true;
@@ -283,8 +323,11 @@ namespace rex
 				if (ors.size() == 1)
 					return ors[0];
 
-				else
+				else if (ors.size() > 1)
 					return new OrAtom(ors);
+
+				else
+					throw "Something went horribly wrong";
 			
 			} // End try
 

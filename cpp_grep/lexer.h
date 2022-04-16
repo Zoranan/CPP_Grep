@@ -180,14 +180,14 @@ namespace rex
 				string t(OPEN_CLASS_STR);
 				t.push_back('^');
 				tok.set_text(t);
-				tok.type = TokenType::START_NEG_CHAR_CLASS;
+				//tok.type = TokenType::START_NEG_CHAR_CLASS;
 				i++;
 				isNeg = true;
 			}
 			else
 			{
 				tok.set_text(OPEN_CLASS_STR);
-				tok.type = TokenType::START_CHAR_CLASS;
+				//tok.type = TokenType::START_CHAR_CLASS;
 			}
 
 			end_token(toks, tok);
@@ -298,24 +298,24 @@ namespace rex
 
 				case '(':
 					tok.location = i;
-
+					tok.type = TokenType::START_GROUP;
 					// Look ahead
 					if (i + 2 < pattern.length() && pattern[i + 1] == '?' && pattern[i + 2] == ':')
 					{
 						tok.set_text("(?:");
-						tok.type = TokenType::START_GROUP_NO_CAP;
+						//tok.type = TokenType::START_GROUP_NO_CAP;
 						i += 2;
 					}
 					else
 					{
 						tok.set_text("(");
-						tok.type = TokenType::START_GROUP;
+						//tok.type = TokenType::START_GROUP;
 					}
 
 					end_token(tokens, tok);
 					break;
 
-				case ')':
+				case ')':					
 					tok.location = i;
 					tok.set_text(")");
 					tok.type = TokenType::END_GROUP;
@@ -355,6 +355,7 @@ namespace rex
 
 				case OPEN_CLASS_C:
 					tok.location = i;
+					tok.type = TokenType::START_CHAR_CLASS;
 					i += lex_char_class(pattern, i + 1, tokens, tok);
 					break;
 

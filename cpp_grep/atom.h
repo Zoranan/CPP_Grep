@@ -585,6 +585,18 @@ namespace rex
 		}
 	};
 
+	class DummyAtom : public Atom
+	{
+	public:
+		DummyAtom(Atom* next = NULLPTR) : Atom(next) { }
+
+		int try_match(Match& m, string& str, unsigned int start_pos) override
+		{
+			try_capture(start_pos, 0);
+			return try_next(0, m, str, start_pos);
+		}
+	};
+
 	//////////////////////
 	//	ROOT Atom
 	//////////////////////
