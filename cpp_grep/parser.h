@@ -98,7 +98,7 @@ namespace rex
 				atoms.push_back(new CharLiteral('\r', true));
 				atoms.push_back(new CharLiteral('\t', true));
 				atoms.push_back(new CharLiteral('\f', true));
-				special = new InversionAtom(new OrAtom(atoms));
+				special = new OrAtom(atoms);
 				break;
 			}
 
