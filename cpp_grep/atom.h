@@ -226,6 +226,9 @@ namespace rex
 
 		int try_match(string& str, unsigned int start_pos) override
 		{
+			if (start_pos >= str.size())
+				return -1;
+
 			int r = _atom->try_match(str, start_pos);
 			if (r > -1)
 				return -1;
