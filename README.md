@@ -5,9 +5,10 @@ A regex library written in C++
 
 ## Features
 
-This is a WIP. Many features are likely broken. Any known broken features will be noted below.
+This is a WIP. Any known broken features will be noted below.
 
-- Char classes (negated as well)
+- Char classes
+- Negated char classes  <== Currently broken
 - Branches (|)
 - Any char (.) <== Currently always in single-line mode
 - Capture (and non capturing) groups
@@ -22,10 +23,10 @@ This is a WIP. Many features are likely broken. Any known broken features will b
 
 Capture groups are enclosed in parenthesis. If you don't want output to be captured, use (?: to start your group
 
-Capture groups are buggy still when quantified.
+Capture groups are currently stable.
 
 - Each group can capture multiple values if it is quantified
-- Groups can be nested
+- Groups can be nested and captures will be made for each
 - Capture groups are numbered in the order that their left parenthesis appear in
 
 
@@ -33,6 +34,15 @@ Capture groups are buggy still when quantified.
 
 - Mostly this needs a lot of ad-hoc testing to find the glaring bugs and correct them. 
 - Automated testing should be created as well
-- Multiline and Singleline modes need to be implemented and tested
-- Case insensitive mode needs to be fixed for CharRange
-- Add some optimization to the parser to avoid generating a regex that double checks chars
+- Multiline and Singleline modes need to be implemented
+- Case insensitive mode needs to be implemented for CharRange
+- Better exceptions and exception handling needs to be added to provide useful error messages
+- The end of line needs to be fixed so it works properly with lazy quantifiers
+
+
+## Nice to Have Features
+- Word boundary (\b and \B)
+- Back-references to previous capture groups (\1, \2, etc...)
+- 4 and 8 digit unicode support (\u#### and \u########)
+- Modifier flags at the beginning of the regex string (features for those flags still need to be implemented)
+- Support for substitution operator similar to perl for outputting a custom string from captured groups

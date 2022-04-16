@@ -276,9 +276,13 @@ namespace rex
 			int r = _atom->try_match(m, str, start_pos);
 			if (r > -1)
 				return -1;
-			
+
 			try_capture(start_pos, 1);
-			return 1;
+			int fin = try_next(1, m, str, start_pos);
+			if (fin < 0)
+				pop_state();
+
+			return fin;
 		}
 
 		~InversionAtom()
@@ -434,6 +438,7 @@ namespace rex
 				}
 				else
 				{
+					_atom->pop_state();	//Since the last attempt to match this atom failed, remember to revert its memory back once
 					break;
 				}
 			}

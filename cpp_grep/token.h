@@ -8,7 +8,6 @@ namespace rex
 		EMPTY,
 		LITERAL,
 		START_CHAR_CLASS,		// [
-		//START_NEG_CHAR_CLASS,	// [^
 		END_CHAR_CLASS,			// ]
 		CHAR_RANGE,
 		SPECIAL,
@@ -29,8 +28,7 @@ namespace rex
 		GREEDY_RANGE_QUAN,
 		LAZY_RANGE_QUAN,
 
-		START_GROUP,			// (
-		//START_GROUP_NO_CAP,		// (?:
+		START_GROUP,			// ( or (?:
 		END_GROUP				// )
 	};
 
@@ -132,12 +130,6 @@ namespace rex
 			case TokenType::START_GROUP:
 				val += "START_GROUP";
 				break;
-			/*case TokenType::START_GROUP_NO_CAP:
-				val += "START_GROUP_NO_CAP";
-				break;
-			case TokenType::START_NEG_CHAR_CLASS:
-				val += "START_NEG_CHAR_CLASS";
-				break;*/
 			case TokenType::STATIC_QUAN:
 				val += "STATIC_QUAN";
 				break;
