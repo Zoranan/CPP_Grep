@@ -165,11 +165,14 @@ namespace rex
 					{
 						vector<Token> t = sub_seq(toks, i, TokenType::END_GROUP, true);
 						
-						//Check if this is a non-capturing group
-						if (tok.originalText.length() == 3 && tok.originalText[1] == '?' && tok.originalText[2] == ':')
+						if (t.empty())
 						{
-							if (t.empty())
-								continue;	//Ignore empty non-capturing groups
+							throw "Empty group at " + toStr(tok.location);
+						}
+
+						//Check if this is a non-capturing group
+						else if (tok.originalText.length() == 3 && tok.originalText[1] == '?' && tok.originalText[2] == ':')
+						{
 							next = parse_inner(t, caseSensitive, false, gNum);
 						}
 
@@ -179,21 +182,13 @@ namespace rex
 							unsigned short captureGroup = gNum;	//Store off our capture group before it gets incremented
 							gNum++;
 
-							if (t.empty())
-							{
-								//If this is an empty group, we will keep it just to preserve the group numbering
-								next = new DummyAtom();	//TODO: Maybe warn the user in stderr
-							}
-							else
-							{
-								next = parse_inner(t, caseSensitive, false, gNum);
+							next = parse_inner(t, caseSensitive, false, gNum);
 
-								// We must append start and end dummy atoms to make sure each nested group has a unique start and end atom
-								next = new DummyAtom(next);
-								next->append(new DummyAtom());
-							}
-
-							next->assign_group(captureGroup);
+							//Wrap next in a start and end atom
+							GroupStart* start = new GroupStart(captureGroup, next);
+							GroupEnd* end = new GroupEnd(start);
+							start->append(end);
+							next = start;
 						}
 						break;
 					}

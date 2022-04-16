@@ -40,7 +40,13 @@ namespace rex
 			if (_pattern == NULLPTR)
 				throw "Regex was not initialized";
 
-			int r = _pattern->try_match(out_match, str, 0);
+			int r = _pattern->try_match(str, 0);
+
+			// Make sure to commit all of our capture groups if it was successful
+			if (r > -1)
+				_pattern->commit(out_match, str);
+
+			// We don't need to reset here since the root will call reset before each match attempt
 
 			return r > -1;
 		}
