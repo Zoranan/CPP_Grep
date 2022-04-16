@@ -51,6 +51,10 @@ int process_matches(string& pattern, istream& stream, void (*func)(string&, Matc
 			}
 		}
 	}
+	catch (exception e)
+	{
+		cerr << e.what() << endl;
+	}
 	catch (string s)
 	{
 		cerr << s << endl;

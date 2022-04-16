@@ -40,21 +40,9 @@ namespace rex
 			if (_pattern == NULLPTR)
 				throw "Regex was not initialized";
 
-			for (unsigned int i = 0; i < str.length(); i++)
-			{
-				_pattern->reset();
+			int r = _pattern->try_match(out_match, str, 0);
 
-				int r = _pattern->try_match(out_match, str, i);
-				if (r > -1)
-				{
-					out_match.set_start(i);
-					out_match.set_length(r);
-					out_match.take_capture(str);
-					_pattern->commit(out_match, str);	//Commit the rest of the cap groups
-					return true;
-				}
-			}
-			return false;
+			return r > -1;
 		}
 
 		~Regex()

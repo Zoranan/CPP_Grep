@@ -15,25 +15,82 @@ namespace rex
 
 	class Atom
 	{
+
 	protected:
 		Atom* _next;
+		Atom* _group_root;
+		bool _capture;
+		//TODO: This needs to be a vector since the same atom can be the end of multiple groups
+		unsigned short _group_num;	//Only the root of a capture group should be assigned as a member of that group
+
+		struct PendingCap
+		{
+		public:
+			unsigned int start_pos;
+			unsigned int length;
+
+			PendingCap(unsigned int start, unsigned int len)
+			{
+				start_pos = start;
+				length = len;
+			}
+
+			Capture finish(string& str)
+			{
+				return Capture(start_pos, str.substr(start_pos, length));
+			}
+
+			void set_end_pos(unsigned int end_pos)
+			{
+				length = end_pos - start_pos;
+			}
+		};
+
+		vector<PendingCap> _pendingCaps;
+
+		void end_capture(unsigned int end_pos)	//NOT length
+		{
+			_pendingCaps[_pendingCaps.size() - 1].set_end_pos(end_pos);
+		}
 
 		int try_next(int current_result, Match& m, string& str, unsigned int start_pos)
 		{
 			if (_next == NULLPTR)
+			{
+				if (_group_root != NULLPTR)
+					_group_root->end_capture(start_pos + current_result);
+
 				return current_result;
+			}
 
 			int nextRes = _next->try_match(m, str, start_pos + current_result);
 			if (nextRes > -1)
+			{
+				if (_group_root != NULLPTR)
+					_group_root->end_capture(start_pos + current_result);
+
 				return current_result + nextRes;
+			}
 
 			_next->reset();	//Reset our next if it exists, but fails
 			return -1;
 		}
 
+		void connect_end_to_root(Atom* root)
+		{
+			if (_next != NULLPTR)
+				_next->connect_end_to_root(root);
+
+			else
+				_group_root = root;
+		}
+
 	public:
 		Atom(Atom* next = NULLPTR)
 		{
+			_group_root = NULLPTR;
+			_group_num = 0;
+			_capture = false;
 			_next = next;
 		}
 
@@ -58,19 +115,39 @@ namespace rex
 				_next->append(n);
 		}
 
-		virtual void pop_state()
+		void pop_state()
 		{
+			if (_capture)
+				_pendingCaps.pop_back();
+		}
 
+		void assign_group(unsigned short gnum)
+		{
+			_capture = true;
+			_group_num = gnum;
+
+			connect_end_to_root(this);	//This is a the group's root node, notify the ending node who to contact after a capture
+		}
+
+		void try_capture(unsigned int start_pos, unsigned int length)
+		{
+			if (_capture)
+				_pendingCaps.push_back(PendingCap(start_pos, length));
 		}
 
 		virtual void reset()
 		{
+			_pendingCaps.clear();
+
 			if (_next != NULLPTR)
 				_next->reset();
 		}
 
 		virtual void commit(Match& m, string& str)
 		{
+			for (size_t i = 0; i < _pendingCaps.size(); i++)
+				m.add_group_capture(_group_num, _pendingCaps[i].finish(str));
+
 			if (_next != NULLPTR)
 				_next->commit(m, str);
 		}
@@ -123,6 +200,7 @@ namespace rex
 			// This atom succeeded
 			if (c == _char)
 			{
+				try_capture(start_pos, 1);
 				return try_next(1, m, str, start_pos);
 			}
 
@@ -157,10 +235,25 @@ namespace rex
 			//This Atom succeeded
 			if (_min <= c && c <= _max)
 			{
+				try_capture(start_pos, 1);
 				return try_next(1, m, str, start_pos);
 			}
 
 			// All success branches should have returned out by now. If we're here, then this Atom or one of its sub atoms failed
+			return -1;
+		}
+	};
+
+	class AnyChar : public Atom
+	{
+		int try_match(Match& m, string& str, unsigned int start_pos) override
+		{
+			if (start_pos >= 0 && start_pos < str.size())
+			{
+				try_capture(start_pos, 1);
+				return try_next(1, m, str, start_pos);
+			}
+
 			return -1;
 		}
 	};
@@ -184,6 +277,7 @@ namespace rex
 			if (r > -1)
 				return -1;
 			
+			try_capture(start_pos, 1);
 			return 1;
 		}
 
@@ -225,6 +319,7 @@ namespace rex
 
 		void commit(Match& m, string& str) override
 		{
+			//TODO: Keep track of which branch succeeded and only commit that one
 			for (size_t i = 0; i < _atoms.size(); i++)
 			{
 				_atoms[i]->commit(m, str);
@@ -244,7 +339,10 @@ namespace rex
 				{
 					int fin = try_next(r, m, str, start_pos);	//_next is auto reset on failure with this call
 					if (fin > -1)
+					{
+						try_capture(start_pos, r);
 						return fin;
+					}
 					else
 						_atoms[i]->reset();	//The part after this branch failed, so reset this branch
 				}
@@ -324,6 +422,8 @@ namespace rex
 			end_positions.push(start_pos);
 			unsigned int last_end_pos = start_pos;
 
+			try_capture(start_pos, 0);	//Place a capture on the pending before doing anything else, so if our next succeeds it will have something to update
+
 			while (end_positions.size() <= _max)
 			{
 				int r = _atom->try_match(m, str, last_end_pos);
@@ -354,25 +454,14 @@ namespace rex
 				{
 					if (end_positions.size() - 1 <= _min)	//Subtract one to account for starting value on stack. <= to account for the item we will pop off next
 					{
-						reset();
+						//reset();
 						return -1;
 					}
 
 					end_positions.pop();
-					_atom->pop_state();	//Step this atom's memory back once
+					_atom->pop_state();	//Step this atom's memory back once (only apply's if its a capture group)
 
-					int nr = _next->try_match(m, str, end_positions.top());
-					if (nr > -1)
-					{
-						fin = end_positions.top() - start_pos + nr;
-					}
-					else
-					{
-						fin = -1;
-						_next->reset();
-					}
-
-					//fin = try_next(end_positions.top() - start_pos, m, str, end_positions.top());
+					fin = try_next(end_positions.top() - start_pos, m, str, start_pos);
 				}
 
 			if (fin == -1)
@@ -406,19 +495,27 @@ namespace rex
 				//If we've done the minimum matching needed, check our next atom and return out if success
 				if (c >= _min)
 				{
+					try_capture(start_pos, i);	//Premptive capture. We must do this before calling try_next!
 					int fin = try_next(i, m, str, start_pos);	//_next is auto reset here on failure
 					if (fin > -1)
+					{
 						return fin;
+					}
+					else
+					{
+						pop_state();
+					}
 				}
 
 				// We're already maxed out and should have returned by now if the next atom was successful. So return failure
 				if (c >= _max)
 				{
-					reset();
+					//reset();
 					return -1;
 				}
 
 				// We have not reached max yet, try our inner atom again
+
 				r = _atom->try_match(m, str, start_pos + i);
 				if (r > -1)
 				{
@@ -428,68 +525,10 @@ namespace rex
 				//We can't match our inner atom, so we must fail
 				else
 				{
-					reset();
+					//reset();
 					return -1;
 				}
 			}
-		}
-	};
-
-
-	class GroupAtom : public Atom
-	{
-	private:
-		Atom* _atom;
-		unsigned int _g_num;
-		vector<Capture> _pending_caps;
-
-	public:
-		GroupAtom(Atom* inner, unsigned int g_num)
-		{
-			_atom = inner;
-			_g_num = g_num;
-		}
-
-		void pop_state() override
-		{
-			_pending_caps.pop_back();
-		}
-
-		void reset() override
-		{
-			_pending_caps.clear();
-			_atom->reset();
-
-			Atom::reset();
-		}
-
-		void commit(Match& m, string& str) override
-		{
-			for (size_t i = 0; i < _pending_caps.size(); i++)
-			{
-				_pending_caps[i].take_capture(str);	//Store the captured value from our string
-				m.add_group_capture(_g_num, _pending_caps[i]);
-			}
-			_atom->commit(m, str);
-			Atom::commit(m, str);
-		}
-
-		int try_match(Match& m, string& str, unsigned int start_pos) override
-		{
-			int r = _atom->try_match(m, str, start_pos);
-			if (r > -1)
-			{
-				_pending_caps.push_back(Capture(start_pos, r));
-
-				r = try_next(r, m, str, start_pos);
-			}
-			
-			return r;
-		}
-
-		~GroupAtom()
-		{
-			delete _atom;
 		}
 	};
 
@@ -546,13 +585,42 @@ namespace rex
 		}
 	};
 
-	class AnyChar : public Atom
+	//////////////////////
+	//	ROOT Atom
+	//////////////////////
+
+	/// <summary>
+	/// Exists solely to act as the whole match capture
+	/// </summary>
+	class RootAtom : public Atom
 	{
+
+	public:
+		RootAtom(Atom* innerRoot = NULLPTR) : Atom(innerRoot)
+		{
+			/*innerRoot->append(new DummyAtom());
+			assign_group(0);*/
+		}
+
 		int try_match(Match& m, string& str, unsigned int start_pos) override
 		{
-			if (start_pos >= 0 && start_pos < str.size())
-				return try_next(1, m, str, start_pos);
+			for (; start_pos < str.length(); start_pos++)
+			{
+				try_capture(start_pos, 0);
+				int r = try_next(0, m, str, start_pos);
 
+				if (r > -1)
+				{
+					m.add_group_capture(0, Capture(start_pos, str.substr(start_pos, r)));
+					commit(m, str);	//Commit the rest of the cap groups
+					reset();
+					return r;
+				}
+
+				pop_state();
+			}
+
+			reset();
 			return -1;
 		}
 	};

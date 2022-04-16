@@ -114,7 +114,7 @@ namespace rex
 				return special;
 		}
 
-		static Atom* parse_inner(vector<Token> toks, bool caseSensitive, bool in_char_class, unsigned int &gNum)
+		static Atom* parse_inner(vector<Token> toks, bool caseSensitive, bool in_char_class, unsigned short &gNum)
 		{
 			vector<Atom*> ors;
 			Atom* next = NULLPTR;
@@ -165,9 +165,9 @@ namespace rex
 					case TokenType::START_GROUP:
 					{
 						vector<Token> t = sub_seq(toks, i, TokenType::END_GROUP, true);
-						unsigned int thisGnum = gNum;
-						Atom* g_inner = parse_inner(t, caseSensitive, false, ++gNum);
-						next = new GroupAtom(g_inner, thisGnum);
+						unsigned short captureGroup = gNum;	//Store off our capture group before it gets incremented
+						next = parse_inner(t, caseSensitive, false, ++gNum);	//Increment the gNum before we pass it in
+						next->assign_group(captureGroup);
 						break;
 					}
 
@@ -306,8 +306,17 @@ namespace rex
 	public:
 		static Atom* parse(vector<Token> toks, bool caseSensistive)
 		{
-			unsigned int gNum = 1;	// That starting group number
-			return parse_inner(toks, caseSensistive, false, gNum);
+			unsigned short gNum = 1;	// The starting group number. Must be a var so it can be passed by ref
+			try 
+			{
+				Atom* inner = parse_inner(toks, caseSensistive, false, gNum);
+				return new RootAtom(inner);
+			}
+			catch (string err)
+			{
+				throw err;
+			}
+
 		}
 
 };
