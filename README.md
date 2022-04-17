@@ -8,7 +8,7 @@ A regex library written in C++
 This is a WIP. Any known broken features will be noted below.
 
 - Char classes
-- Negated char classes  <== Currently broken
+- Negated char classes
 - Branches (|)
 - Any char (.) <== Currently always in single-line mode
 - Capture (and non capturing) groups
@@ -16,14 +16,12 @@ This is a WIP. Any known broken features will be noted below.
 - Escape chars: \r \n \t \f
 - Special classes: \d \w \s and \D \W \S
 - Beginning of line (^)	<== Currently always in multiline mode
-- End of line ($) 		<== This isn't working right, specifically when used with lazy quantifiers. It forces the lazy quantifier to drag itself out until it reaches its max value or the end of line is reached.
+- End of line ($) 		<== This isn't working right when used with lazy quantifiers. It forces the lazy quantifier to drag itself out until it reaches its max value or the end of line is reached.
 
 
 ## Capture Groups
 
 Capture groups are enclosed in parenthesis. If you don't want output to be captured, use (?: to start your group
-
-Capture groups are currently stable.
 
 - Each group can capture multiple values if it is quantified
 - Groups can be nested and captures will be made for each
@@ -41,8 +39,7 @@ Capture groups are currently stable.
 
 
 ## Nice to Have Features
-- Word boundary (\b and \B)
+- Word boundary (\b and/or \B)
 - Back-references to previous capture groups (\1, \2, etc...)
 - 4 and 8 digit unicode support (\u#### and \u########)
-- Modifier flags at the beginning of the regex string (features for those flags still need to be implemented)
 - Support for substitution operator similar to perl for outputting a custom string from captured groups
