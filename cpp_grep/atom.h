@@ -654,7 +654,7 @@ namespace rex
 	//////////////////////
 
 	/// <summary>
-	/// The root nod of the regex. Tries to match downstream atoms at each position in the input string until one is successful, then returns.
+	/// The root nod of the regex.
 	/// </summary>
 	class RootAtom : public Atom
 	{
@@ -677,20 +677,8 @@ namespace rex
 
 		int try_match(string& str, unsigned int start_pos) override
 		{
-			for (; start_pos < str.length(); start_pos++)
-			{
-				reset();	//Make sure the state is clear before attempting to take more captures
-
-				int r = try_next(0, str, start_pos);
-
-				if (r > -1)
-				{
-					return r;
-				}
-			}
-
 			reset();
-			return -1;
+			return try_next(0, str, start_pos);
 		}
 	};
 

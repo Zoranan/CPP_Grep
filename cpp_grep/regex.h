@@ -35,20 +35,71 @@ namespace rex
 			return _pattern_str;
 		}
 
-		bool try_match(string& str, Match& out_match)
+		/// <summary>
+		/// Attempt to match the regex at the specified start location only
+		/// </summary>
+		/// <param name="str">The string to match</param>
+		/// <param name="out_match">The Match object to hold the results</param>
+		/// <param name="pos">The position to match at</param>
+		/// <returns>True if the match succeeds, false otherwise</returns>
+		bool matchAt(string &str, Match &out_match, unsigned int pos)
 		{
 			if (_pattern == NULLPTR)
 				throw "Regex was not initialized";
 
-			int r = _pattern->try_match(str, 0);
-
-			// Make sure to commit all of our capture groups if it was successful
+			int r = _pattern->try_match(str, pos);
 			if (r > -1)
+			{
 				_pattern->commit(out_match, str);
+				return true;
+			}
+			
+			return false;
+		}
 
-			// We don't need to reset here since the root will call reset before each match attempt
+		/// <summary>
+		/// Attempt to match the regex anywhere in the string, starting at the specified start location and working right until a match is found
+		/// </summary>
+		/// <param name="str">The string to match</param>
+		/// <param name="out_match">The Match object to hold the results</param>
+		/// <param name="The position in the string to start checking at"></param>
+		/// <returns></returns>
+		bool match(string& str, Match& out_match, unsigned int start_pos = 0)
+		{
+			for (; start_pos < str.length(); start_pos++)
+				if (matchAt(str, out_match, start_pos))
+					return true;
+			
+			return false;
+		}
 
-			return r > -1;
+		/// <summary>
+		/// Attempts to match the regex as many times as possible in the string
+		/// </summary>
+		/// <param name="str">The string to match</param>
+		/// <param name="The position in the string to start checking at"></param>
+		/// <returns>A vector of matches made</returns>
+		vector<Match> matches(string& str, unsigned int start_pos = 0)
+		{
+			if (_pattern == NULLPTR)
+				throw "Regex was not initialized";
+
+			vector<Match> res;
+			
+			while (start_pos < str.length())
+			{
+				Match m;
+				if (matchAt(str, m, start_pos))
+				{
+					res.push_back(m);
+					size_t len = m.get_group(0).length();
+					start_pos += len == 0 ? 1 : len;	//Always move forward by at least 1
+				}
+				else
+					start_pos++;
+			}
+
+			return res;
 		}
 
 		~Regex()
