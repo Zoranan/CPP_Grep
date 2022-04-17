@@ -24,6 +24,16 @@ namespace rex
 			return _groups[groupnum];
 		}
 
+		unsigned int length()
+		{
+			return get_group(0).length();
+		}
+
+		string value()
+		{
+			return get_group(0).value();
+		}
+
 		/// <summary>
 		/// Returns the string value of the specified group number. Group 0 returns the whole match value
 		/// </summary>

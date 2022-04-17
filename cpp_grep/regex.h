@@ -36,7 +36,7 @@ namespace rex
 		}
 
 		/// <summary>
-		/// Attempt to match the regex at the specified start location only
+		/// Attempt to match the regex at the specified start location only, not counting 0 length matches as success
 		/// </summary>
 		/// <param name="str">The string to match</param>
 		/// <param name="out_match">The Match object to hold the results</param>
@@ -48,7 +48,7 @@ namespace rex
 				throw "Regex was not initialized";
 
 			int r = _pattern->try_match(str, pos);
-			if (r > -1)
+			if (r > 0)
 			{
 				_pattern->commit(out_match, str);
 				return true;

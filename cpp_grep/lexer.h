@@ -188,7 +188,7 @@ namespace rex
 				tok.set_text(OPEN_CLASS_STR);
 			}
 
-			end_token(toks, tok);
+			end_token(toks, tok);	//Add the opening token
 
 			//Check for a leading dash
 			if (pattern[i] == '-')
@@ -200,7 +200,7 @@ namespace rex
 			}
 
 			// Loop through remaining chars to tokenize each one
-			for (; i < pattern.length(); i++)
+			while (i < pattern.length())
 			{
 				char c = pattern[i];
 
@@ -219,55 +219,67 @@ namespace rex
 
 					return i - start + 1;
 				}
-				else if (c == '\\')
+
+				// Look for an escape seqence, set the token to it, and move I forward but do not end the token yet
+				if (c == '\\')
 				{
 					if (i + 1 < pattern.length())
 					{
-						i++;
-						get_escaped_token(pattern[i], tok);
-						end_token(toks, tok);
+						tok.location = i;
+						get_escaped_token(pattern[i + 1], tok);
+						i += tok.originalText.length();
 					}
 					else
 					{
 						throw "Incomplete escape sequence at: " + toStr(i);
 					}
 				}
-				else if (i + 2 < pattern.length() && pattern[i + 1] == '-' && pattern[i + 2] != CLOSE_CLASS_C)	//At least 2 chars remain, the next one is a dash, and second is not end of class
-				{
-					char second = pattern[i + 2];
 
-					if (second != '\\' || (i + 3 < pattern.length() && !get_escaped_token(pattern[i + 3], tok)))
-					{
-						if (second == '\\')
-						{
-							second = pattern[i + 3];
-							tok.originalText = pattern.substr(i, 4);
-							tok.value = pattern.substr(i, 2) + second;
-							i++;
-						}
-						else
-							tok.set_text(pattern.substr(i, 3));
-
-						if (second <= c)
-							throw "Invalid character range: " + tok.originalText;
-
-						tok.location = i;
-						tok.type = TokenType::CHAR_RANGE;
-						end_token(toks, tok);
-						i += 2;
-					}
-					else
-					{
-						throw "Invalid character range at: " + toStr(i) + ". Cannot use token " + tok.originalText;
-					}
-				}
+				//This wasn't an escape sequence. Just grab the token literal and move forward once
 				else
 				{
 					tok.location = i;
-					tok.set_text(pattern.substr(i, 1));
 					tok.type = TokenType::LITERAL;
-					end_token(toks, tok);
+					tok.set_text(string(1, c));
+					i++;
 				}
+
+				// Now check how many chars are left to decide what we want to do
+				// If there are at least 2 characters left in the string, the next is a dash, and the one after is not a closing char class, 
+				// then we are about to enter a character range
+				if (i + 2 < pattern.size() && pattern[i] == '-' && pattern[i + 1] != CLOSE_CLASS_C)
+				{
+					// Check if the token is currently set to special. Character ranges can't be set to special
+					if (tok.type == TokenType::SPECIAL)
+						throw "Invalid character range at " + toStr(tok.location) + ". The special sequence '" + tok.originalText + "' cannot be used in a character range";
+
+					char minRange = tok.value[0];
+					char maxRange;
+					i++;
+					if (pattern[i] == '\\')
+					{
+						if (get_escaped_token(pattern[i + 1], tok))
+							throw "Invalid character range at " + toStr(i) + ". The special sequence '" + tok.originalText + "' cannot be used in a character range";
+
+						maxRange = tok.value[0];
+						i += tok.originalText.length();
+					}
+					else
+					{
+						maxRange = pattern[i];
+						i++;
+					}
+
+					if (minRange >= maxRange)
+						throw "Invalid character range at " + toStr(start) + ". Minimum value must be less than the maximum value";
+
+					tok.originalText = pattern.substr(start, i - start - 1);
+					tok.value = string(1, minRange) + "-" + maxRange;
+					tok.type = TokenType::CHAR_RANGE;
+					tok.location = start;
+				}
+
+				end_token(toks, tok);
 			}
 
 			// We should have returned out by now
