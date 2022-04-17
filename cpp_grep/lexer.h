@@ -104,9 +104,21 @@ namespace rex
 			return 1;
 		}
 
-		static bool get_escaped_token(char c, Token& tokOut)
+		/// <summary>
+		/// Get an escape token as a char literal or special
+		/// </summary>
+		/// <param name="pattern">The regex pattern</param>
+		/// <param name="start">The starting location of the escape sequence (after the slash)</param>
+		/// <param name="tokOut"></param>
+		/// <returns></returns>
+		static bool get_escaped_token(string& pattern, size_t start, Token& tokOut)
 		{
-			switch (c)
+			if (start >= pattern.length())
+				throw "Incomplete escape sequence at " + toStr(start);
+
+			tokOut.location = start;
+
+			switch (pattern[start])
 			{
 			case 'r':
 				tokOut.originalText = "\\r";
@@ -165,7 +177,7 @@ namespace rex
 				return true;
 
 			default:
-				tokOut.set_text(string(1, c));
+				tokOut.set_text(string(1, pattern[start]));
 				tokOut.type = TokenType::LITERAL;
 				return false;
 			}
@@ -223,16 +235,8 @@ namespace rex
 				// Look for an escape seqence, set the token to it, and move I forward but do not end the token yet
 				if (c == '\\')
 				{
-					if (i + 1 < pattern.length())
-					{
-						tok.location = i;
-						get_escaped_token(pattern[i + 1], tok);
-						i += tok.originalText.length();
-					}
-					else
-					{
-						throw "Incomplete escape sequence at: " + toStr(i);
-					}
+					get_escaped_token(pattern, i + 1, tok);
+					i += tok.originalText.length();
 				}
 
 				//This wasn't an escape sequence. Just grab the token literal and move forward once
@@ -258,7 +262,7 @@ namespace rex
 					i++;
 					if (pattern[i] == '\\')
 					{
-						if (get_escaped_token(pattern[i + 1], tok))
+						if (get_escaped_token(pattern, i + 1, tok))
 							throw "Invalid character range at " + toStr(i) + ". The special sequence '" + tok.originalText + "' cannot be used in a character range";
 
 						maxRange = tok.value[0];
@@ -290,7 +294,6 @@ namespace rex
 		static vector<Token> lex(string pattern, bool caseSensitive = true, bool multiline = true, bool singleline = false)
 		{
 			vector<Token> tokens;
-			//bool inClass = false;
 
 			for (size_t i = 0; i < pattern.length(); i++)
 			{
@@ -313,13 +316,11 @@ namespace rex
 					if (i + 2 < pattern.length() && pattern[i + 1] == '?' && pattern[i + 2] == ':')
 					{
 						tok.set_text("(?:");
-						//tok.type = TokenType::START_GROUP_NO_CAP;
 						i += 2;
 					}
 					else
 					{
 						tok.set_text("(");
-						//tok.type = TokenType::START_GROUP;
 					}
 
 					end_token(tokens, tok);
@@ -424,13 +425,10 @@ namespace rex
 					break;
 
 				case '\\':
-					if (i + 1 < pattern.length())
-					{
-						char next = pattern[i + 1];
-						get_escaped_token(next, tok);
-						end_token(tokens, tok);
-						i++;
-					}
+					i++;
+					get_escaped_token(pattern, i, tok);
+					end_token(tokens, tok);
+					
 					break;
 
 				default:
