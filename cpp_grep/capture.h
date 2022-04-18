@@ -7,24 +7,9 @@ namespace rex
 
 	class CaptureBase
 	{
-	protected:
-		size_t _start;
-
 	public:
-		CaptureBase(size_t s = 0)
-		{
-			_start = s;
-		}
 
-		void set_start(size_t s)
-		{
-			_start = s;
-		}
-
-		size_t start()
-		{
-			return _start;
-		}
+		virtual size_t start() = 0;
 
 		virtual string value() = 0;
 
@@ -40,11 +25,18 @@ namespace rex
 	{
 	protected:
 		string _value;
+		size_t _start;
 
 	public:
-		Capture(size_t s = 0, string val = "") : CaptureBase(s)
+		Capture(size_t s = 0, string val = "")
 		{
+			_start = s;
 			_value = val;
+		}
+
+		size_t start() override
+		{
+			return _start;
 		}
 
 		string value() override

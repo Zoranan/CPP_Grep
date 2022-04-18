@@ -8,7 +8,7 @@ namespace rex
 {
 	using namespace std;
 
-	class Match
+	class Match : CaptureBase
 	{
 	private:
 		vector<Group> _groups;
@@ -24,7 +24,12 @@ namespace rex
 			return _groups[groupnum];
 		}
 
-		unsigned int length()
+		size_t start() override
+		{
+			return _groups.empty() ? 0 : _groups[0].start();
+		}
+
+		size_t length() override
 		{
 			return get_group(0).length();
 		}

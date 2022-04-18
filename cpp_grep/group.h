@@ -19,10 +19,12 @@ namespace rex
 
 		void add_capture(Capture cap)
 		{
-			if (_captures.size() == 0)
-				_start = cap.start();
-
 			_captures.push_back(cap);
+		}
+
+		size_t start() override
+		{
+			return _captures.empty() ? 0 : _captures[0].start();
 		}
 
 		string value() override
