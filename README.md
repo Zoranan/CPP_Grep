@@ -30,7 +30,7 @@ Capture groups are enclosed in parenthesis. If you don't want output to be captu
 
 ## TODO
 
-- Mostly this needs a lot of ad-hoc testing to find the glaring bugs and correct them. 
+- Mostly this needs a lot of ad-hoc testing to find bugs and correct them. 
 - Automated testing should be created as well
 - Multiline and Singleline modes need to be implemented
 - Case insensitive mode needs to be implemented for CharRange
@@ -41,5 +41,4 @@ Capture groups are enclosed in parenthesis. If you don't want output to be captu
 ## Nice to Have Features
 - Word boundary (\b and/or \B)
 - Back-references to previous capture groups (\1, \2, etc...)
-- 4 and 8 digit unicode support (\u#### and \u########)
 - Support for substitution operator similar to perl for outputting a custom string from captured groups
