@@ -164,14 +164,12 @@ namespace rex
 	private:
 		char _min;
 		char _max;
-		bool _caseSensitive;
 
 	public:
-		CharRange(char min, char max, bool caseSensitive = true, Atom* next = NULLPTR) : Atom(next)
+		CharRange(char min, char max, Atom* next = NULLPTR) : Atom(next)
 		{
 			_min = min;
 			_max = max;
-			_caseSensitive = caseSensitive;
 		}
 
 		int try_match(string& str, unsigned int start_pos) override
@@ -180,8 +178,6 @@ namespace rex
 				return -1;
 
 			char c = str[start_pos];
-
-			//TODO: Case insensitive mode
 
 			//This Atom succeeded
 			if (_min <= c && c <= _max)

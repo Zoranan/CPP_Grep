@@ -71,16 +71,16 @@ namespace rex
 			{
 			case 'd':
 			case 'D':
-				special = new CharRange('0', '9', true);
+				special = new CharRange('0', '9');
 				break;
 
 			case 'w':
 			case 'W':
 			{
 				vector<Atom*> atoms;
-				atoms.push_back(new CharRange('a', 'z', true));
-				atoms.push_back(new CharRange('A', 'Z', true));
-				atoms.push_back(new CharRange('0', '9', true));
+				atoms.push_back(new CharRange('a', 'z'));
+				atoms.push_back(new CharRange('A', 'Z'));
+				atoms.push_back(new CharRange('0', '9'));
 				atoms.push_back(new CharLiteral('_', true));
 				special = new OrAtom(atoms);
 				break;
@@ -133,8 +133,46 @@ namespace rex
 						next = new CharLiteral(tok.value[0], caseSensitive);
 						break;
 					case TokenType::CHAR_RANGE:
-						next = new CharRange(tok.value[0], tok.value[2], caseSensitive);
+					{
+						char min = tok.value[0];
+						char max = tok.value[2];
+						next = new CharRange(min, max);
+						if (!caseSensitive)
+						{
+							if (min <= 'A' && max >= 'z' || max < 'A' || min > 'z' || (max > 'Z' && min < 'a'))
+								//This range already covers both cases or has no alpha characters
+								break;
+
+							bool containsUpper = max > 'A' && min < 'Z';
+							bool containsLower = max > 'a' && min < 'z';
+							vector<Atom*> parts;
+							parts.push_back(next);
+
+							if (containsUpper)
+							{
+								//Get the alpha char bounds of the character range, to lower
+								char lowerMin = min >= 'A' ? min + 32 : 'a';
+								char lowerMax = max <= 'Z' ? max + 32 : 'z';
+
+								if (lowerMin < lowerMax)
+									ors.push_back(new CharRange(lowerMin, lowerMax));
+							}
+							else if (containsLower)
+							{
+								//Get the alpha char bounds of the character range, to upper
+								char upperMin = min >= 'a' ? min - 32 : 'A';
+								char upperMax = max <= 'z' ? max - 32 : 'Z';
+
+								if (upperMin < upperMax)
+									ors.push_back(new CharRange(upperMin, upperMax));
+							}
+
+							if (parts.size() > 1)
+								next = new OrAtom(parts);
+
+						}
 						break;
+					}
 					case TokenType::CARRET:
 						next = new BeginLineAtom();
 						break;
