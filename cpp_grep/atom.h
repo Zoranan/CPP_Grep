@@ -121,7 +121,7 @@ namespace rex
 	class CharLiteral : public Atom
 	{
 	private:
-		char _char;
+		unsigned char _char;
 		bool _caseSensitive;
 
 	public:
@@ -131,7 +131,7 @@ namespace rex
 			_caseSensitive = true;
 		}
 
-		CharLiteral(char c, bool caseSensitive = true, Atom* next = NULLPTR) : Atom(next)
+		CharLiteral(unsigned char c, bool caseSensitive = true, Atom* next = NULLPTR) : Atom(next)
 		{
 			_char = isalpha(c) && !caseSensitive ? tolower(c) : c;
 			_caseSensitive = caseSensitive;
@@ -142,7 +142,7 @@ namespace rex
 			if (start_pos >= str.size())
 				return -1;
 			
-			char c = str[start_pos];
+			unsigned char c = str[start_pos];
 			if (isalpha(c) && !_caseSensitive)
 				c = tolower(c);
 
@@ -162,11 +162,11 @@ namespace rex
 	class CharRange : public Atom
 	{
 	private:
-		char _min;
-		char _max;
+		unsigned char _min;
+		unsigned char _max;
 
 	public:
-		CharRange(char min, char max, Atom* next = NULLPTR) : Atom(next)
+		CharRange(unsigned char min, unsigned char max, Atom* next = NULLPTR) : Atom(next)
 		{
 			_min = min;
 			_max = max;
@@ -177,7 +177,7 @@ namespace rex
 			if (start_pos >= str.size())
 				return -1;
 
-			char c = str[start_pos];
+			unsigned char c = str[start_pos];
 
 			//This Atom succeeded
 			if (_min <= c && c <= _max)
@@ -543,7 +543,7 @@ namespace rex
 	class WordBoundary : public Atom
 	{
 	private:
-		bool is_word_char(char c)
+		bool is_word_char(unsigned char c)
 		{
 			return c == '-' || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9');
 		}

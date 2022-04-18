@@ -134,8 +134,8 @@ namespace rex
 						break;
 					case TokenType::CHAR_RANGE:
 					{
-						char min = tok.value[0];
-						char max = tok.value[2];
+						unsigned char min = tok.value[0];
+						unsigned char max = tok.value[2];
 						next = new CharRange(min, max);
 						if (!caseSensitive)
 						{
@@ -151,8 +151,8 @@ namespace rex
 							if (containsUpper)
 							{
 								//Get the alpha char bounds of the character range, to lower
-								char lowerMin = min >= 'A' ? min + 32 : 'a';
-								char lowerMax = max <= 'Z' ? max + 32 : 'z';
+								unsigned char lowerMin = min >= 'A' ? min + 32 : 'a';
+								unsigned char lowerMax = max <= 'Z' ? max + 32 : 'z';
 
 								if (lowerMin < lowerMax)
 									ors.push_back(new CharRange(lowerMin, lowerMax));
@@ -160,8 +160,8 @@ namespace rex
 							else if (containsLower)
 							{
 								//Get the alpha char bounds of the character range, to upper
-								char upperMin = min >= 'a' ? min - 32 : 'A';
-								char upperMax = max <= 'z' ? max - 32 : 'Z';
+								unsigned char upperMin = min >= 'a' ? min - 32 : 'A';
+								unsigned char upperMax = max <= 'z' ? max - 32 : 'Z';
 
 								if (upperMin < upperMax)
 									ors.push_back(new CharRange(upperMin, upperMax));

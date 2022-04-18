@@ -4,7 +4,6 @@
 #pragma once
 #include <iostream>
 #include <fstream>
-#include <string>
 #include "regex.h"
 
 #define ARGC_OFFSET 1

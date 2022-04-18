@@ -35,7 +35,7 @@ namespace rex
 			//Look for first number
 			for (; i < pattern.length(); i++)
 			{
-				char c = pattern[i];
+				unsigned char c = pattern[i];
 				if (c < '0' || c > '9')
 					break;
 			}
@@ -55,7 +55,7 @@ namespace rex
 					bool foundSec = false;
 					for (; i < pattern.length(); i++)
 					{
-						char c = pattern[i];
+						unsigned char c = pattern[i];
 						if (c < '0' || c > '9')
 							break;
 
@@ -104,7 +104,7 @@ namespace rex
 			return 1;
 		}
 
-		static bool read_hex_char(char in, char& out)
+		static bool read_hex_char(unsigned char in, unsigned char& out)
 		{
 			if (in >= '0' && in <= '9')
 			{
@@ -169,8 +169,8 @@ namespace rex
 			// Hexadecimal char codes (ascii)
 			case 'x':
 			{
-				char a;
-				char b;
+				unsigned char a;
+				unsigned char b;
 
 				if (start + 2 >= pattern.length() 
 					|| !read_hex_char(pattern[start + 1], a) 
@@ -263,7 +263,7 @@ namespace rex
 			// Loop through remaining chars to tokenize each one
 			while (i < pattern.length())
 			{
-				char c = pattern[i];
+				unsigned char c = pattern[i];
 
 				if (c == CLOSE_CLASS_C)
 				{
@@ -306,8 +306,8 @@ namespace rex
 					if (tok.type == TokenType::SPECIAL)
 						throw "Invalid character range at " + toStr(tok.location) + ". The special sequence '" + tok.originalText + "' cannot be used in a character range";
 
-					char minRange = tok.value[0];
-					char maxRange;
+					unsigned char minRange = tok.value[0];
+					unsigned char maxRange;
 					i++;
 					if (pattern[i] == '\\')
 					{
@@ -327,7 +327,8 @@ namespace rex
 						throw "Invalid character range at " + toStr(start) + ". Minimum value must be less than the maximum value";
 
 					tok.originalText = pattern.substr(start, i - start - 1);
-					tok.value = string(1, minRange) + "-" + maxRange;
+					tok.value = string(1, minRange) + "-";
+					tok.value.push_back(maxRange);
 					tok.type = TokenType::CHAR_RANGE;
 					tok.location = start;
 				}
@@ -346,7 +347,7 @@ namespace rex
 
 			for (size_t i = 0; i < pattern.length(); i++)
 			{
-				char c = pattern[i];
+				unsigned char c = pattern[i];
 				Token tok;
 
 				switch (c)

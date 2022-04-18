@@ -35,6 +35,7 @@ Capture groups are enclosed in parenthesis. If you don't want output to be captu
 - Multiline and Singleline modes need to be implemented
 - Better exceptions and exception handling needs to be added to provide useful error messages
 - The end of line needs to be fixed so it works properly with lazy quantifiers
+- Enable regex to parse over unsigned strings to allow reading of binary files
 
 
 ## Nice to Have Features
