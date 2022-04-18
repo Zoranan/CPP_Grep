@@ -215,6 +215,16 @@ namespace rex
 				tokOut.type = TokenType::SPECIAL;
 				return true;
 
+			case 'b':
+				tokOut.set_text("\\b");
+				tokOut.type = TokenType::SPECIAL;
+				return true;
+
+			case 'B':
+				tokOut.set_text("\\B");
+				tokOut.type = TokenType::SPECIAL;
+				return true;
+
 			default:
 				tokOut.set_text(string(1, pattern[start]));
 				tokOut.type = TokenType::LITERAL;

@@ -544,6 +544,33 @@ namespace rex
 		}
 	};
 
+	class WordBoundary : public Atom
+	{
+	private:
+		bool is_word_char(char c)
+		{
+			return c == '-' || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9');
+		}
+
+	public:
+		int try_match(string& str, unsigned int start_pos) override
+		{
+			bool is1aWord = false;
+			bool is2aWord = false;
+
+			if (start_pos > 0)
+				is1aWord = is_word_char(str[start_pos - 1]);
+
+			if (start_pos < str.length())
+				is2aWord = is_word_char(str[start_pos]);
+
+			if (is1aWord != is2aWord)
+				return try_next(0, str, start_pos);
+
+			return -1;
+		}
+	};
+
 	/// <summary>
 	/// Stores capture group information at the current position and tries downstream atoms to determine if the capture be kept or thrown away
 	/// </summary>
@@ -681,7 +708,5 @@ namespace rex
 			return try_next(0, str, start_pos);
 		}
 	};
-
-	//TODO: Create word boundry match
 }
 

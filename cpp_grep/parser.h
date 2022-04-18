@@ -99,6 +99,11 @@ namespace rex
 				break;
 			}
 
+			case 'b':
+			case 'B':
+				special = new WordBoundary();
+				break;
+
 			default:
 				throw "Invalid escape sequence: '" + tok.originalText + "' at " + toStr(tok.location);
 				break;
