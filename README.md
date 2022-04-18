@@ -39,6 +39,5 @@ Capture groups are enclosed in parenthesis. If you don't want output to be captu
 
 
 ## Nice to Have Features
-- Word boundary (\b and/or \B)
 - Back-references to previous capture groups (\1, \2, etc...)
 - Support for substitution operator similar to perl for outputting a custom string from captured groups
