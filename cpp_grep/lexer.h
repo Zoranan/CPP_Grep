@@ -104,6 +104,28 @@ namespace rex
 			return 1;
 		}
 
+		static bool read_hex_char(char in, char& out)
+		{
+			if (in >= '0' && in <= '9')
+			{
+				out = in - '0';
+				return true;
+			}
+
+			if (in >= 'A' && in <= 'F')
+			{
+				out = in - 'A' + 10;
+				return true;
+			}
+
+			if (in >= 'a' && in <= 'f')
+			{
+				out = in - 'a' + 10;
+				return true;
+			}
+			return false;
+		}
+
 		/// <summary>
 		/// Get an escape token as a char literal or special
 		/// </summary>
@@ -143,6 +165,23 @@ namespace rex
 				tokOut.value = "\f";
 				tokOut.type = TokenType::LITERAL;
 				return false;
+
+			// Hexadecimal char codes (ascii)
+			case 'x':
+			{
+				char a;
+				char b;
+
+				if (start + 2 >= pattern.length() 
+					|| !read_hex_char(pattern[start + 1], a) 
+					|| !read_hex_char(pattern[start + 2], b))
+					throw "Invalid escape sequence at " + toStr(start) + ". Expected a 2 digit hex value";
+
+				tokOut.originalText = pattern.substr(start - 1, 4);
+				tokOut.value = string(1, a * 16 + b);
+				tokOut.type = TokenType::LITERAL;
+				return false;
+			}
 
 				//META
 
@@ -425,8 +464,8 @@ namespace rex
 					break;
 
 				case '\\':
-					i++;
-					get_escaped_token(pattern, i, tok);
+					get_escaped_token(pattern, i + 1, tok);
+					i += tok.originalText.length() - 1;
 					end_token(tokens, tok);
 					
 					break;
