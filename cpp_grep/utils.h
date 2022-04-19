@@ -28,7 +28,7 @@ namespace rex
 
 	unsigned char tolower_u(unsigned char c)
 	{
-		return isalpha_u(c) ? c + 32 : c;
+		return isalpha_u(c) ? static_cast<unsigned char>(c + 32) : c;
 	}
 
 	unsigned char tolower_u(char c)

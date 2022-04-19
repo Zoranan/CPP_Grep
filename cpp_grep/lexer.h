@@ -108,19 +108,19 @@ namespace rex
 		{
 			if (in >= '0' && in <= '9')
 			{
-				out = in - '0';
+				out = static_cast<unsigned char>(in - '0');
 				return true;
 			}
 
 			if (in >= 'A' && in <= 'F')
 			{
-				out = in - 'A' + 10;
+				out = static_cast<unsigned char>(in - 'A' + 10);
 				return true;
 			}
 
 			if (in >= 'a' && in <= 'f')
 			{
-				out = in - 'a' + 10;
+				out = static_cast<unsigned char>(in - 'a' + 10);
 				return true;
 			}
 			return false;

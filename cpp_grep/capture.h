@@ -20,6 +20,8 @@ namespace rex
 		{
 			return start() + length();
 		}
+
+		virtual ~CaptureBase() {}
 	};
 
 	class Capture : public CaptureBase

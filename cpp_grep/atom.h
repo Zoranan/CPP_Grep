@@ -140,7 +140,7 @@ namespace rex
 			if (start_pos >= str.size())
 				return -1;
 			
-			unsigned char c = str[start_pos];
+			unsigned char c = static_cast<unsigned char>(str[start_pos]);
 			if (!_caseSensitive && isupper_u(c))
 				c = tolower_u(c);
 
@@ -195,7 +195,7 @@ namespace rex
 	{
 		int try_match(const string& str, size_t start_pos) override
 		{
-			if (start_pos >= 0 && start_pos < str.size())
+			if (start_pos < str.size())
 			{
 				return try_next(1, str, start_pos);
 			}
