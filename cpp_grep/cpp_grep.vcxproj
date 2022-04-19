@@ -149,6 +149,7 @@
     <ClInclude Include="group.h" />
     <ClInclude Include="lexer.h" />
     <ClInclude Include="match.h" />
+    <ClInclude Include="MatchFormatter.h" />
     <ClInclude Include="numtostr.h" />
     <ClInclude Include="parser.h" />
     <ClInclude Include="regex.h" />

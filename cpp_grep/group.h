@@ -12,22 +12,22 @@ namespace rex
 		vector<Capture> _captures;
 
 	public:
-		Capture get_capture(size_t capnum)
+		Capture get_capture(const size_t capnum) const
 		{
 			return _captures[capnum];
 		}
 
-		void add_capture(Capture cap)
+		void add_capture(const Capture cap)
 		{
 			_captures.push_back(cap);
 		}
 
-		size_t start() override
+		size_t start() const override
 		{
 			return _captures.empty() ? 0 : _captures[0].start();
 		}
 
-		string value() override
+		string value() const override
 		{
 			string t;
 			for (size_t i = 0; i < _captures.size(); i++)
@@ -37,7 +37,7 @@ namespace rex
 			return t;
 		}
 
-		size_t length() override
+		size_t length() const override
 		{
 			size_t l = 0;
 			for (size_t i = 0; i < _captures.size(); i++)
@@ -47,12 +47,12 @@ namespace rex
 			return l;
 		}
 
-		size_t total_caps()
+		size_t total_caps() const
 		{
 			return _captures.size();
 		}
 
-		Capture last_capture()
+		Capture last_capture() const
 		{
 			if (_captures.size() == 0)
 				return Capture(0, "");
@@ -60,7 +60,7 @@ namespace rex
 			return _captures[_captures.size() - 1];
 		}
 
-		string last_capture_value()
+		string last_capture_value() const
 		{
 			last_capture().value();
 		}

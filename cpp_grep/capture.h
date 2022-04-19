@@ -9,11 +9,11 @@ namespace rex
 	{
 	public:
 
-		virtual size_t start() = 0;
+		virtual size_t start() const = 0;
 
-		virtual string value() = 0;
+		virtual string value() const = 0;
 
-		virtual size_t length() = 0;
+		virtual size_t length() const = 0;
 
 		size_t end()
 		{
@@ -28,23 +28,23 @@ namespace rex
 		size_t _start;
 
 	public:
-		Capture(size_t s = 0, string val = "")
+		Capture(const size_t s = 0, const string val = "")
 		{
 			_start = s;
 			_value = val;
 		}
 
-		size_t start() override
+		size_t start() const override
 		{
 			return _start;
 		}
 
-		string value() override
+		string value() const override
 		{
 			return _value;
 		}
 
-		size_t length() override
+		size_t length() const override
 		{
 			return _value.length();
 		}

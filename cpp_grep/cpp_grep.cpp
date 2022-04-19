@@ -73,9 +73,7 @@ int main(int argc, char* argv[])
 	else
 	{			
 		// Grab our pattern to match with
-		// TODO: This should be a regex
 		string pattern = string(argv[ARGC_OFFSET]);
-
 
 		// Only one arg was specified, so we must be reading from cin
 		if (argc == ARGC_OFFSET + 1)

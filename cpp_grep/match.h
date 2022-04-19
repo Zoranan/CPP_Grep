@@ -14,7 +14,7 @@ namespace rex
 		vector<Group> _groups;
 
 	public:
-		Group get_group(unsigned short groupnum)
+		Group get_group(unsigned short groupnum) const
 		{
 			if (groupnum >= _groups.size())
 			{
@@ -24,17 +24,17 @@ namespace rex
 			return _groups[groupnum];
 		}
 
-		size_t start() override
+		size_t start() const override
 		{
 			return _groups.empty() ? 0 : _groups[0].start();
 		}
 
-		size_t length() override
+		size_t length() const override
 		{
 			return get_group(0).length();
 		}
 
-		string value()
+		string value() const override
 		{
 			return get_group(0).value();
 		}
@@ -44,7 +44,7 @@ namespace rex
 		/// </summary>
 		/// <param name="groupnum"></param>
 		/// <returns></returns>
-		string get_group_value(unsigned short groupnum)
+		string get_group_value(const unsigned short groupnum) const
 		{
 
 			if (groupnum > _groups.size())
@@ -54,7 +54,7 @@ namespace rex
 				return _groups[groupnum].value();
 		}
 
-		void add_group_capture(unsigned short groupNum, Capture cap)
+		void add_group_capture(const unsigned short groupNum, const Capture cap)
 		{
 			while (groupNum >= _groups.size())
 				_groups.push_back(Group());
@@ -63,7 +63,7 @@ namespace rex
 
 		}
 
-		void print_all_info(ostream &o)
+		void print_all_info(ostream &o) const
 		{
 			for (size_t i = 0; i < _groups.size(); i++)
 			{

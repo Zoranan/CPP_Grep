@@ -42,7 +42,7 @@ namespace rex
 		/// <param name="out_match">The Match object to hold the results</param>
 		/// <param name="pos">The position to match at</param>
 		/// <returns>True if the match succeeds, false otherwise</returns>
-		bool matchAt(string &str, Match &out_match, unsigned int pos)
+		bool matchAt(string &str, Match &out_match, size_t pos)
 		{
 			if (_pattern == NULLPTR)
 				throw "Regex was not initialized";
@@ -64,7 +64,7 @@ namespace rex
 		/// <param name="out_match">The Match object to hold the results</param>
 		/// <param name="The position in the string to start checking at"></param>
 		/// <returns></returns>
-		bool match(string& str, Match& out_match, unsigned int start_pos = 0)
+		bool match(string& str, Match& out_match, size_t start_pos = 0)
 		{
 			for (; start_pos < str.length(); start_pos++)
 				if (matchAt(str, out_match, start_pos))
@@ -79,7 +79,7 @@ namespace rex
 		/// <param name="str">The string to match</param>
 		/// <param name="The position in the string to start checking at"></param>
 		/// <returns>A vector of matches made</returns>
-		vector<Match> matches(string& str, unsigned int start_pos = 0)
+		vector<Match> matches(string& str, size_t start_pos = 0)
 		{
 			if (_pattern == NULLPTR)
 				throw "Regex was not initialized";
