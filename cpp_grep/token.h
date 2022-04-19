@@ -3,46 +3,48 @@
 
 namespace rex
 {
-	enum class TokenType : int
-	{
-		EMPTY,
-		LITERAL,
-		START_CHAR_CLASS,		// [
-		END_CHAR_CLASS,			// ]
-		CHAR_RANGE,
-		SPECIAL,
-		CARRET,					// ^
-		DOLLAR,					// $
-		DOT,					// .
-		OR_OP,					// |
-
-		GREEDY_PLUS,			// +
-		GREEDY_STAR,			// *
-		GREEDY_Q_MARK,			// ?
-		LAZY_PLUS,				// +?
-		LAZY_STAR,				// *?
-		LAZY_Q_MARK,			// ??
-		STATIC_QUAN,
-		GREEDY_MIN_QUAN,
-		LAZY_MIN_QUAN,
-		GREEDY_RANGE_QUAN,
-		LAZY_RANGE_QUAN,
-
-		START_GROUP,			// ( or (?:
-		END_GROUP				// )
-	};
 
 	class Token
 	{
 	public:
-		enum TokenType type;
+		// Enclosing this enum in the token class to give it a scope, since enum class isn't supported in older C++ versions
+		enum Type
+		{
+			EMPTY,
+			LITERAL,
+			START_CHAR_CLASS,		// [
+			END_CHAR_CLASS,			// ]
+			CHAR_RANGE,
+			SPECIAL,
+			CARRET,					// ^
+			DOLLAR,					// $
+			DOT,					// .
+			OR_OP,					// |
+
+			GREEDY_PLUS,			// +
+			GREEDY_STAR,			// *
+			GREEDY_Q_MARK,			// ?
+			LAZY_PLUS,				// +?
+			LAZY_STAR,				// *?
+			LAZY_Q_MARK,			// ??
+			STATIC_QUAN,
+			GREEDY_MIN_QUAN,
+			LAZY_MIN_QUAN,
+			GREEDY_RANGE_QUAN,
+			LAZY_RANGE_QUAN,
+
+			START_GROUP,			// ( or (?:
+			END_GROUP				// )
+		};
+
+		enum Type type;
 		size_t location;
 		string originalText;
 		string value;
 
 		Token()
 		{
-			type = TokenType::EMPTY;
+			type = Type::EMPTY;
 			location = 0;
 			originalText = "";
 			value = "";
@@ -56,7 +58,7 @@ namespace rex
 
 		bool isQuan()
 		{
-			return type >= TokenType::GREEDY_PLUS && type <= TokenType::LAZY_RANGE_QUAN;
+			return type >= Type::GREEDY_PLUS && type <= Type::LAZY_RANGE_QUAN;
 		}
 
 		string toString()
@@ -64,73 +66,73 @@ namespace rex
 			string val("Type: ");
 			switch (type)
 			{
-			case TokenType::CARRET:
+			case Type::CARRET:
 				val += "CARRET";
 				break;
-			case TokenType::CHAR_RANGE:
+			case Type::CHAR_RANGE:
 				val += "CHAR_RANGE";
 				break;
-			case TokenType::DOLLAR:
+			case Type::DOLLAR:
 				val += "DOLLAR";
 				break;
-			case TokenType::DOT:
+			case Type::DOT:
 				val += "DOT";
 				break;
-			case TokenType::EMPTY:
+			case Type::EMPTY:
 				val += "EMPTY";
 				break;
-			case TokenType::END_CHAR_CLASS:
+			case Type::END_CHAR_CLASS:
 				val += "END_CHAR_CLASS";
 				break;
-			case TokenType::END_GROUP:
+			case Type::END_GROUP:
 				val += "END_GROUP";
 				break;
-			case TokenType::GREEDY_PLUS:
+			case Type::GREEDY_PLUS:
 				val += "GREEDY_PLUS";
 				break;
-			case TokenType::GREEDY_Q_MARK:
+			case Type::GREEDY_Q_MARK:
 				val += "GREEDY_Q_MARK";
 				break;
-			case TokenType::GREEDY_STAR:
+			case Type::GREEDY_STAR:
 				val += "GREEDY_STAR";
 				break;
-			case TokenType::LAZY_PLUS:
+			case Type::LAZY_PLUS:
 				val += "LAZY_PLUS";
 				break;
-			case TokenType::LAZY_Q_MARK:
+			case Type::LAZY_Q_MARK:
 				val += "LAZY_Q_MARK";
 				break;
-			case TokenType::LAZY_STAR:
+			case Type::LAZY_STAR:
 				val += "LAZY_STAR";
 				break;
-			case TokenType::LITERAL:
+			case Type::LITERAL:
 				val += "LITERAL";
 				break;
-			case TokenType::GREEDY_MIN_QUAN:
+			case Type::GREEDY_MIN_QUAN:
 				val += "GREEDY_MIN_QUAN";
 				break;
-			case TokenType::LAZY_MIN_QUAN:
+			case Type::LAZY_MIN_QUAN:
 				val += "LAZY_MIN_QUAN";
 				break;
-			case TokenType::OR_OP:
+			case Type::OR_OP:
 				val += "OR_OP";
 				break;
-			case TokenType::GREEDY_RANGE_QUAN:
+			case Type::GREEDY_RANGE_QUAN:
 				val += "GREEDY_RANGE_QUAN";
 				break;
-			case TokenType::LAZY_RANGE_QUAN:
+			case Type::LAZY_RANGE_QUAN:
 				val += "LAZY_RANGE_QUAN";
 				break;
-			case TokenType::SPECIAL:
+			case Type::SPECIAL:
 				val += "SPECIAL";
 				break;
-			case TokenType::START_CHAR_CLASS:
+			case Type::START_CHAR_CLASS:
 				val += "START_CHAR_CLASS";
 				break;
-			case TokenType::START_GROUP:
+			case Type::START_GROUP:
 				val += "START_GROUP";
 				break;
-			case TokenType::STATIC_QUAN:
+			case Type::STATIC_QUAN:
 				val += "STATIC_QUAN";
 				break;
 

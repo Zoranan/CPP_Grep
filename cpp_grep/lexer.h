@@ -12,7 +12,7 @@ namespace rex
 	private:
 		static void end_token(vector<Token>& toks, Token& current)
 		{
-			if (current.type != TokenType::EMPTY)
+			if (current.type != Token::Type::EMPTY)
 			{
 				if (current.isQuan() && (toks.size() == 0 || toks[toks.size() - 1].isQuan()))
 					throw "Invalid quantifier at " + toStr(current.location + 1);
@@ -24,7 +24,7 @@ namespace rex
 
 			current.originalText.erase();
 			current.value.erase();
-			current.type = TokenType::EMPTY;
+			current.type = Token::Type::EMPTY;
 		}
 
 		static size_t lex_quantifier(string& pattern, size_t start, vector<Token>& toks, Token& tok)
@@ -43,13 +43,13 @@ namespace rex
 			// If a number was found, then this could be a quantifier
 			if (i > start)
 			{
-				tok.type = TokenType::STATIC_QUAN;
+				tok.type = Token::Type::STATIC_QUAN;
 
 				//Check for a comma next. If it's there, then this might either be a range or min quan
 				if (pattern[i] == ',')
 				{
 					i++;
-					tok.type = TokenType::GREEDY_MIN_QUAN;
+					tok.type = Token::Type::GREEDY_MIN_QUAN;
 
 					//Look for a second number
 					bool foundSec = false;
@@ -64,7 +64,7 @@ namespace rex
 					}
 
 					if (foundSec)
-						tok.type = TokenType::GREEDY_RANGE_QUAN;
+						tok.type = Token::Type::GREEDY_RANGE_QUAN;
 				}
 
 				//The last char should be a closing }
@@ -74,20 +74,20 @@ namespace rex
 					size_t len = i - start;
 					string val = pattern.substr(start, len - 1);
 					tok.originalText = "{" + val + "}";
-					if (tok.type == TokenType::GREEDY_MIN_QUAN)
+					if (tok.type == Token::Type::GREEDY_MIN_QUAN)
 						val.pop_back();	// Remove training comma from value
 					
 					// Check for the lazy modifier
-					if (tok.type != TokenType::STATIC_QUAN && i < pattern.size() && pattern[i] == '?')
+					if (tok.type != Token::Type::STATIC_QUAN && i < pattern.size() && pattern[i] == '?')
 					{
 						tok.originalText.push_back('?');
 						i++;
 						len++;
 
-						if (tok.type == TokenType::GREEDY_MIN_QUAN)
-							tok.type = TokenType::LAZY_MIN_QUAN;
+						if (tok.type == Token::Type::GREEDY_MIN_QUAN)
+							tok.type = Token::Type::LAZY_MIN_QUAN;
 						else
-							tok.type = TokenType::LAZY_RANGE_QUAN;
+							tok.type = Token::Type::LAZY_RANGE_QUAN;
 					}
 
 					tok.value = val;
@@ -99,7 +99,7 @@ namespace rex
 
 			//If we made it here then something failed and this is not a quantifier. Add it as a literal
 			tok.set_text("{");
-			tok.type = TokenType::LITERAL;
+			tok.type = Token::Type::LITERAL;
 			end_token(toks, tok);
 			return 1;
 		}
@@ -145,25 +145,25 @@ namespace rex
 			case 'r':
 				tokOut.originalText = "\\r";
 				tokOut.value = "\r";
-				tokOut.type = TokenType::LITERAL;
+				tokOut.type = Token::Type::LITERAL;
 				return false;
 
 			case 'n':
 				tokOut.originalText = "\\n";
 				tokOut.value = "\n";
-				tokOut.type = TokenType::LITERAL;
+				tokOut.type = Token::Type::LITERAL;
 				return false;
 
 			case 't':
 				tokOut.originalText = "\\t";
 				tokOut.value = "\t";
-				tokOut.type = TokenType::LITERAL;
+				tokOut.type = Token::Type::LITERAL;
 				return false;
 
 			case 'f':
 				tokOut.originalText = "\\f";
 				tokOut.value = "\f";
-				tokOut.type = TokenType::LITERAL;
+				tokOut.type = Token::Type::LITERAL;
 				return false;
 
 			// Hexadecimal char codes (ascii)
@@ -179,7 +179,7 @@ namespace rex
 
 				tokOut.originalText = pattern.substr(start - 1, 4);
 				tokOut.value = string(1, a * 16 + b);
-				tokOut.type = TokenType::LITERAL;
+				tokOut.type = Token::Type::LITERAL;
 				return false;
 			}
 
@@ -187,47 +187,47 @@ namespace rex
 
 			case 'd':
 				tokOut.set_text("\\d");
-				tokOut.type = TokenType::SPECIAL;
+				tokOut.type = Token::Type::SPECIAL;
 				return true;
 
 			case 'D':
 				tokOut.set_text("\\D");
-				tokOut.type = TokenType::SPECIAL;
+				tokOut.type = Token::Type::SPECIAL;
 				return true;
 
 			case 'w':
 				tokOut.set_text("\\w");
-				tokOut.type = TokenType::SPECIAL;
+				tokOut.type = Token::Type::SPECIAL;
 				return true;
 
 			case 'W':
 				tokOut.set_text("\\W");
-				tokOut.type = TokenType::SPECIAL;
+				tokOut.type = Token::Type::SPECIAL;
 				return true;
 
 			case 's':
 				tokOut.set_text("\\s");
-				tokOut.type = TokenType::SPECIAL;
+				tokOut.type = Token::Type::SPECIAL;
 				return true;
 
 			case 'S':
 				tokOut.set_text("\\S");
-				tokOut.type = TokenType::SPECIAL;
+				tokOut.type = Token::Type::SPECIAL;
 				return true;
 
 			case 'b':
 				tokOut.set_text("\\b");
-				tokOut.type = TokenType::SPECIAL;
+				tokOut.type = Token::Type::SPECIAL;
 				return true;
 
 			case 'B':
 				tokOut.set_text("\\B");
-				tokOut.type = TokenType::SPECIAL;
+				tokOut.type = Token::Type::SPECIAL;
 				return true;
 
 			default:
 				tokOut.set_text(string(1, pattern[start]));
-				tokOut.type = TokenType::LITERAL;
+				tokOut.type = Token::Type::LITERAL;
 				return false;
 			}
 		}
@@ -255,7 +255,7 @@ namespace rex
 			if (pattern[i] == '-')
 			{
 				tok.set_text("-");
-				tok.type = TokenType::LITERAL;
+				tok.type = Token::Type::LITERAL;
 				end_token(toks, tok);
 				i++;
 			}
@@ -274,7 +274,7 @@ namespace rex
 
 					tok.location = i;
 					tok.set_text(CLOSE_CLASS_STR);
-					tok.type = TokenType::END_CHAR_CLASS;
+					tok.type = Token::Type::END_CHAR_CLASS;
 
 					end_token(toks, tok);
 
@@ -292,7 +292,7 @@ namespace rex
 				else
 				{
 					tok.location = i;
-					tok.type = TokenType::LITERAL;
+					tok.type = Token::Type::LITERAL;
 					tok.set_text(string(1, c));
 					i++;
 				}
@@ -303,7 +303,7 @@ namespace rex
 				if (i + 2 < pattern.size() && pattern[i] == '-' && pattern[i + 1] != CLOSE_CLASS_C)
 				{
 					// Check if the token is currently set to special. Character ranges can't be set to special
-					if (tok.type == TokenType::SPECIAL)
+					if (tok.type == Token::Type::SPECIAL)
 						throw "Invalid character range at " + toStr(tok.location) + ". The special sequence '" + tok.originalText + "' cannot be used in a character range";
 
 					unsigned char minRange = tok.value[0];
@@ -329,7 +329,7 @@ namespace rex
 					tok.originalText = pattern.substr(start, i - start - 1);
 					tok.value = string(1, minRange) + "-";
 					tok.value.push_back(maxRange);
-					tok.type = TokenType::CHAR_RANGE;
+					tok.type = Token::Type::CHAR_RANGE;
 					tok.location = start;
 				}
 
@@ -361,7 +361,7 @@ namespace rex
 
 				case '(':
 					tok.location = i;
-					tok.type = TokenType::START_GROUP;
+					tok.type = Token::Type::START_GROUP;
 					// Look ahead
 					if (i + 2 < pattern.length() && pattern[i + 1] == '?' && pattern[i + 2] == ':')
 					{
@@ -379,21 +379,21 @@ namespace rex
 				case ')':					
 					tok.location = i;
 					tok.set_text(")");
-					tok.type = TokenType::END_GROUP;
+					tok.type = Token::Type::END_GROUP;
 					end_token(tokens, tok);
 					break;
 
 				case '^':
 					tok.location = i;
 					tok.set_text("^");
-					tok.type = TokenType::CARRET;
+					tok.type = Token::Type::CARRET;
 					end_token(tokens, tok);
 					break;
 
 				case '$':
 					tok.location = i;
 					tok.set_text("$");
-					tok.type = TokenType::DOLLAR;
+					tok.type = Token::Type::DOLLAR;
 					end_token(tokens, tok);
 					break;
 
@@ -403,20 +403,20 @@ namespace rex
 
 					tok.location = i;
 					tok.set_text("|");
-					tok.type = TokenType::OR_OP;
+					tok.type = Token::Type::OR_OP;
 					end_token(tokens, tok);
 					break;
 
 				case '.':
 					tok.location = i;
 					tok.set_text(".");
-					tok.type = TokenType::DOT;
+					tok.type = Token::Type::DOT;
 					end_token(tokens, tok);
 					break;
 
 				case OPEN_CLASS_C:
 					tok.location = i;
-					tok.type = TokenType::START_CHAR_CLASS;
+					tok.type = Token::Type::START_CHAR_CLASS;
 					i += lex_char_class(pattern, i + 1, tokens, tok);
 					break;
 
@@ -426,13 +426,13 @@ namespace rex
 					if (i + 1 < pattern.length() && pattern[i + 1] == '?')
 					{
 						tok.set_text("+?");
-						tok.type = TokenType::LAZY_PLUS;
+						tok.type = Token::Type::LAZY_PLUS;
 						i++;
 					}
 					else
 					{
 						tok.set_text("+");
-						tok.type = TokenType::GREEDY_PLUS;
+						tok.type = Token::Type::GREEDY_PLUS;
 					}
 
 					end_token(tokens, tok);
@@ -444,13 +444,13 @@ namespace rex
 					if (i + 1 < pattern.length() && pattern[i + 1] == '?')
 					{
 						tok.set_text("*?");
-						tok.type = TokenType::LAZY_STAR;
+						tok.type = Token::Type::LAZY_STAR;
 						i++;
 					}
 					else
 					{
 						tok.set_text("*");
-						tok.type = TokenType::GREEDY_STAR;
+						tok.type = Token::Type::GREEDY_STAR;
 					}
 
 					end_token(tokens, tok);
@@ -462,13 +462,13 @@ namespace rex
 					if (i + 1 < pattern.length() && pattern[i + 1] == '?')
 					{
 						tok.set_text("??");
-						tok.type = TokenType::LAZY_Q_MARK;
+						tok.type = Token::Type::LAZY_Q_MARK;
 						i++;
 					}
 					else
 					{
 						tok.set_text("?");
-						tok.type = TokenType::GREEDY_Q_MARK;
+						tok.type = Token::Type::GREEDY_Q_MARK;
 					}
 
 					end_token(tokens, tok);
@@ -484,7 +484,7 @@ namespace rex
 				default:
 					tok.location = i;
 					tok.set_text(string(1, c));
-					tok.type = TokenType::LITERAL;
+					tok.type = Token::Type::LITERAL;
 					end_token(tokens, tok);
 					break;
 				}

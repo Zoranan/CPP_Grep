@@ -3,7 +3,7 @@
 #include <vector>
 #include <stack>
 #include "match.h"
-#include "defines.h"	//Contains define for NULLPTR
+#include "defines.h"
 
 namespace rex 
 {
@@ -29,7 +29,7 @@ namespace rex
 		/// <returns>The result of all downstream atoms</returns>
 		int try_next(int current_result, const string& str, size_t start_pos)
 		{
-			if (_next == NULLPTR)
+			if (_next == nullptr)
 			{
 				return current_result;
 			}
@@ -45,7 +45,7 @@ namespace rex
 		}
 
 	public:
-		Atom(Atom* next = NULLPTR)
+		Atom(Atom* next = nullptr)
 		{
 			_next = next;
 		}
@@ -56,7 +56,7 @@ namespace rex
 		/// <param name="n">A pointer to the Atom to append</param>
 		void append(Atom* n)
 		{
-			if (_next == NULLPTR)
+			if (_next == nullptr)
 				_next = n;
 
 			else
@@ -76,7 +76,7 @@ namespace rex
 		/// </summary>
 		virtual void reset()
 		{
-			if (_next != NULLPTR)
+			if (_next != nullptr)
 				_next->reset();
 		}
 
@@ -87,7 +87,7 @@ namespace rex
 		/// <param name="str"></param>
 		virtual void commit(Match& m, const string& str)
 		{
-			if (_next != NULLPTR)
+			if (_next != nullptr)
 				_next->commit(m, str);
 		}
 
@@ -105,7 +105,7 @@ namespace rex
 
 		virtual ~Atom()
 		{
-			if (_next != NULLPTR)
+			if (_next != nullptr)
 				delete _next;
 		}
 	};
@@ -131,7 +131,7 @@ namespace rex
 			_caseSensitive = true;
 		}
 
-		CharLiteral(unsigned char c, bool caseSensitive = true, Atom* next = NULLPTR) : Atom(next)
+		CharLiteral(unsigned char c, bool caseSensitive = true, Atom* next = nullptr) : Atom(next)
 		{
 			_char = isalpha(c) && !caseSensitive ? tolower(c) : c;
 			_caseSensitive = caseSensitive;
@@ -166,7 +166,7 @@ namespace rex
 		unsigned char _max;
 
 	public:
-		CharRange(unsigned char min, unsigned char max, Atom* next = NULLPTR) : Atom(next)
+		CharRange(unsigned char min, unsigned char max, Atom* next = nullptr) : Atom(next)
 		{
 			_min = min;
 			_max = max;
@@ -253,7 +253,7 @@ namespace rex
 		vector<Atom*> _atoms;
 
 	protected:
-		OrAtom(Atom* next = NULLPTR) : Atom(next) {}
+		OrAtom(Atom* next = nullptr) : Atom(next) {}
 
 
 	public:
@@ -401,7 +401,7 @@ namespace rex
 			// If we don't have a next, then return success
 			int fin = try_next(end_positions.top() - start_pos, str, start_pos);	//NOTE: Always pass in the unmodified start position, because this method adds the current position to it!
 			
-			if (_next != NULLPTR)
+			if (_next != nullptr)
 				while (fin == -1)
 				{
 					if (end_positions.size() - 1 <= _min)	//Subtract one to account for starting value on stack. <= to account for the item we will pop off next
@@ -601,7 +601,7 @@ namespace rex
 		vector<PendingCap> _pendingCaps;
 
 	public:
-		GroupStart(unsigned short groupNum, Atom* next = NULLPTR) : Atom(next) 
+		GroupStart(unsigned short groupNum, Atom* next = nullptr) : Atom(next) 
 		{
 			_group_num = groupNum;
 		}

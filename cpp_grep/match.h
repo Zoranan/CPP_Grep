@@ -47,7 +47,7 @@ namespace rex
 		string get_group_value(const unsigned short groupnum) const
 		{
 
-			if (groupnum > _groups.size())
+			if (groupnum >= _groups.size())
 				return string();
 
 			else

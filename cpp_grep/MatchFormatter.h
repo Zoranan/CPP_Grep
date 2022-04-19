@@ -1,6 +1,7 @@
 #pragma once
 #include "match.h"
 #include "numtostr.h"
+#include "defines.h"
 #include <sstream>
 
 namespace rex

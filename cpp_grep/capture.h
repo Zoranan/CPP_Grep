@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include "defines.h"
 
 namespace rex 
 {

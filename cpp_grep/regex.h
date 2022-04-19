@@ -44,7 +44,7 @@ namespace rex
 		/// <returns>True if the match succeeds, false otherwise</returns>
 		bool matchAt(string &str, Match &out_match, size_t pos)
 		{
-			if (_pattern == NULLPTR)
+			if (_pattern == nullptr)
 				throw "Regex was not initialized";
 
 			int r = _pattern->try_match(str, pos);
@@ -81,7 +81,7 @@ namespace rex
 		/// <returns>A vector of matches made</returns>
 		vector<Match> matches(string& str, size_t start_pos = 0)
 		{
-			if (_pattern == NULLPTR)
+			if (_pattern == nullptr)
 				throw "Regex was not initialized";
 
 			vector<Match> res;

@@ -1,5 +1,6 @@
 #pragma once
 #include "capture.h"
+#include "defines.h"
 #include <vector>
 
 namespace rex
