@@ -18,12 +18,12 @@ namespace rex
 
 	public:
 
-		Regex(string pattern, bool caseSensitive = true, bool multiline = true, bool singleline = false)
+		Regex(string pattern, bool caseSensitive = true)
 		{
 			_pattern_str = pattern;
 			if (pattern.size() > 0)
 			{
-				vector<Token> toks = Lexer::lex(pattern, multiline, singleline);
+				vector<Token> toks = Lexer::lex(pattern);
 				_pattern = Parser::parse(toks, caseSensitive);
 			}
 			else
