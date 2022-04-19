@@ -3,6 +3,7 @@
 #include <vector>
 #include <stack>
 #include "match.h"
+#include "utils.h"
 #include "defines.h"
 
 namespace rex 
@@ -98,10 +99,7 @@ namespace rex
 		/// <param name="str">The input string to match against</param>
 		/// <param name="start_pos">The position in the string to match against</param>
 		/// <returns>The number of characters this and all downstream atoms traveled, or -1 for failures.</returns>
-		virtual int try_match(const string& str, size_t start_pos)
-		{
-			return 0;
-		};
+		virtual int try_match(const string& str, size_t start_pos) = 0;
 
 		virtual ~Atom()
 		{
@@ -133,7 +131,7 @@ namespace rex
 
 		CharLiteral(unsigned char c, bool caseSensitive = true, Atom* next = nullptr) : Atom(next)
 		{
-			_char = isalpha(c) && !caseSensitive ? tolower(c) : c;
+			_char = !caseSensitive ? tolower_u(c) : c;
 			_caseSensitive = caseSensitive;
 		}
 
@@ -143,8 +141,8 @@ namespace rex
 				return -1;
 			
 			unsigned char c = str[start_pos];
-			if (isalpha(c) && !_caseSensitive)
-				c = tolower(c);
+			if (!_caseSensitive && isupper_u(c))
+				c = tolower_u(c);
 
 			// This atom succeeded
 			if (c == _char)
@@ -399,7 +397,7 @@ namespace rex
 
 			// We found the most greedy match possible and met the minimum
 			// If we don't have a next, then return success
-			int fin = try_next(end_positions.top() - start_pos, str, start_pos);	//NOTE: Always pass in the unmodified start position, because this method adds the current position to it!
+			int fin = try_next(static_cast<int>(end_positions.top() - start_pos), str, start_pos);	//NOTE: Always pass in the unmodified start position, because this method adds the current position to it!
 			
 			if (_next != nullptr)
 				while (fin == -1)
@@ -412,7 +410,7 @@ namespace rex
 					end_positions.pop();
 					_atom->pop_state();	//Step this atom's memory back once (only apply's if its a capture group)
 
-					fin = try_next(end_positions.top() - start_pos, str, start_pos);
+					fin = try_next(static_cast<int>(end_positions.top() - start_pos), str, start_pos);
 				}
 
 			if (fin == -1)
@@ -581,7 +579,7 @@ namespace rex
 			size_t start_pos;
 			size_t length;
 
-			PendingCap(size_t start, size_t len)
+			PendingCap(size_t start = 0, size_t len = 0)
 			{
 				start_pos = start;
 				length = len;
@@ -613,7 +611,7 @@ namespace rex
 
 		void pop_state() override
 		{
-			_pendingCaps.pop_back();
+			_pendingCaps.resize(_pendingCaps.size() - 1);
 		}
 
 		void reset() override

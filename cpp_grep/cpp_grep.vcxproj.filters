@@ -35,7 +35,7 @@
     <ClInclude Include="atom.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="numtostr.h">
+    <ClInclude Include="utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="lexer.h">

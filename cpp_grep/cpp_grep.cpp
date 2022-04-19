@@ -5,23 +5,19 @@
 #include <iostream>
 #include <fstream>
 #include "regex.h"
+#include "MatchFormatter.h"
 
 #define ARGC_OFFSET 1
 
 using namespace std;
 using namespace rex;
 
-void supress_output(string& line, Match &m)
-{
-	// Do nothing
-}
-
-void print_output(string& line, Match &m)
+void print_output(string& line, Match&)
 {
 	cout << line << endl;
 }
 
-void print_full_match_info(string& line, Match& m)
+void print_full_match_info(string&, Match& m)
 {
 	m.print_all_info(cout);
 	cout << endl;

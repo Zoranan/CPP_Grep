@@ -1,6 +1,6 @@
 #pragma once
 #include "match.h"
-#include "numtostr.h"
+#include "utils.h"
 #include "defines.h"
 #include <sstream>
 
@@ -22,6 +22,8 @@ namespace rex
 			FormatPartBase() {}
 
 			virtual string get(const Match& m) = 0;
+
+			virtual ~FormatPartBase() {}
 		};
 
 		class LiteralPart : public FormatPartBase
@@ -34,7 +36,7 @@ namespace rex
 				_text = text;
 			}
 
-			string get(const Match& m) override
+			string get(const Match&) override
 			{
 				return _text;
 			}
@@ -63,6 +65,7 @@ namespace rex
 		vector<FormatPartBase*> _parts;
 
 	public:
+		MatchFormatter(){}
 
 		MatchFormatter(const string format)
 		{

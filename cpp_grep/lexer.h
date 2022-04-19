@@ -341,7 +341,7 @@ namespace rex
 		}
 
 	public:
-		static vector<Token> lex(string pattern, bool caseSensitive = true, bool multiline = true, bool singleline = false)
+		static vector<Token> lex(string pattern, bool multiline = true, bool singleline = false)
 		{
 			vector<Token> tokens;
 

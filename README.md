@@ -15,6 +15,7 @@ This is a WIP. Any known broken features will be noted below.
 - Standard greedy and non-greedy quantifiers
 - Escape chars: \r \n \t \f
 - Special classes: \d \w \s \b and \D \W \S \B
+- Hex char codes with \x00 -\xFF
 - Beginning of line (^)	<== Currently always in multiline mode
 - End of line ($) 		<== This isn't working right when used with lazy quantifiers. It forces the lazy quantifier to drag itself out until it reaches its max value or the end of line is reached.
 
@@ -40,4 +41,3 @@ Capture groups are enclosed in parenthesis. If you don't want output to be captu
 
 ## Nice to Have Features
 - Back-references to previous capture groups (\1, \2, etc...)
-- Support for substitution operator similar to perl for outputting a custom string from captured groups

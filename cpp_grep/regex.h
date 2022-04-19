@@ -2,7 +2,7 @@
 #include <string>
 #include "match.h"
 #include "atom.h"
-#include "numtostr.h"
+#include "utils.h"
 #include "lexer.h"
 #include "parser.h"
 
@@ -23,7 +23,7 @@ namespace rex
 			_pattern_str = pattern;
 			if (pattern.size() > 0)
 			{
-				vector<Token> toks = Lexer::lex(pattern, caseSensitive, multiline, singleline);
+				vector<Token> toks = Lexer::lex(pattern, multiline, singleline);
 				_pattern = Parser::parse(toks, caseSensitive);
 			}
 			else
