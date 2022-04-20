@@ -132,15 +132,15 @@ namespace rex
 		/// <param name="pattern">The regex pattern</param>
 		/// <param name="start">The starting location of the escape sequence (after the slash)</param>
 		/// <param name="tokOut"></param>
-		/// <returns></returns>
+		/// <returns>True if the escape sequence represents a non literal value</returns>
 		static bool get_escaped_token(string& pattern, size_t start, Token& tokOut)
 		{
 			if (start >= pattern.length())
 				throw "Incomplete escape sequence at " + toStr(start);
 
 			tokOut.location = start;
-
-			switch (pattern[start])
+			char c = pattern[start];
+			switch (c)
 			{
 			case 'r':
 				tokOut.originalText = "\\r";

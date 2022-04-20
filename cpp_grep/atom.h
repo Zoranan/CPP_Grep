@@ -482,6 +482,7 @@ namespace rex
 	/// </summary>
 	class BeginStringAtom : public Atom
 	{
+	public:
 		int try_match(const string& str, size_t start_pos) override
 		{
 			if (start_pos == 0)
@@ -496,6 +497,7 @@ namespace rex
 	/// </summary>
 	class EndStringAtom : public Atom
 	{
+	public:
 		int try_match(const string& str, size_t start_pos) override
 		{
 			if (start_pos == str.size())
@@ -510,6 +512,7 @@ namespace rex
 	/// </summary>
 	class BeginLineAtom : public Atom
 	{
+	public:
 		int try_match(const string& str, size_t start_pos) override
 		{
 			if (start_pos == 0
@@ -527,6 +530,7 @@ namespace rex
 	/// </summary>
 	class EndLineAtom : public Atom
 	{
+	public:
 		int try_match(const string& str, size_t start_pos) override
 		{
 			size_t s = str.size();
@@ -604,9 +608,26 @@ namespace rex
 			_group_num = groupNum;
 		}
 
+		unsigned short group_num() const
+		{
+			return _group_num;
+		}
+
 		void end_capture(size_t end_pos)	//NOT length
 		{
 			_pendingCaps[_pendingCaps.size() - 1].set_end_pos(end_pos);
+		}
+
+		string last_capture(const string &str)
+		{
+			if (_pendingCaps.empty())
+				return string("");
+
+			else
+			{
+				PendingCap cap = _pendingCaps[_pendingCaps.size() - 1];
+				return str.substr(cap.start_pos, cap.length);
+			}
 		}
 
 		void pop_state() override

@@ -63,7 +63,7 @@ namespace rex
 
 		string last_capture_value() const
 		{
-			last_capture().value();
+			return last_capture().value();
 		}
 	};
 }
