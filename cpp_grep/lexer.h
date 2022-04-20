@@ -183,6 +183,31 @@ namespace rex
 				return false;
 			}
 
+			// 'unicode' (not really, just decimal ascii)
+			case 'u':
+			{
+				string numstr;
+				for (size_t i = start + 1; i < pattern.length() && i < start + 5 && isdigit(pattern[i]); i++)
+				{
+					numstr.push_back(pattern[i]);
+				}
+
+				if (numstr.length() > 4 || numstr.length() == 0)	//Make sure at least 3 chars are left
+					throw "Invalid escape sequence at " + toStr(start) + ". Expected a 1-4 digit decimal character value";
+
+				int charVal;
+				istringstream istr(numstr);
+				istr >> charVal;
+
+				if (charVal < 0 || charVal > 255)
+					throw "Invalid character code at " + toStr(start) + ". Value must be between 0 and 255";
+
+				tokOut.originalText = pattern.substr(start - 1, 2 + numstr.length());
+				tokOut.value = string(1, static_cast<char>(charVal));
+				tokOut.type = Token::Type::LITERAL;
+				return false;
+			}
+
 				//META
 
 			case 'd':

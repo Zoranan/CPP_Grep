@@ -16,6 +16,7 @@ This is a WIP. Any known broken features will be noted below.
 - Escape chars: \r \n \t \f
 - Special classes: \d \w \s \b and \D \W \S \B
 - Hex char codes with \x00 -\xFF
+- ASCII codes with \u0000 -\u0255 (leading 0's optional unless followed by a literal digit)
 - Beginning of line (^)	<== Currently always in multiline mode
 - End of line ($) 		<== This isn't working right when used with lazy quantifiers. It forces the lazy quantifier to drag itself out until it reaches its max value or the end of line is reached.
 
