@@ -17,7 +17,11 @@ namespace rex
 		Atom* _pattern;
 
 	public:
-		Regex() { }
+		Regex() 
+		{
+			_pattern_str = "";
+			_pattern = nullptr;
+		}
 
 		Regex(string pattern, bool caseSensitive = true)
 		{
