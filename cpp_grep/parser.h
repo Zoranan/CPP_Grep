@@ -66,6 +66,7 @@ namespace rex
 		{
 			bool invert = tok.value[1] >= 'A' && tok.value[1] <= 'Z';
 			Atom* special;
+			int inv_step = 1;
 
 			switch (tok.value[1])
 			{
@@ -102,6 +103,7 @@ namespace rex
 			case 'b':
 			case 'B':
 				special = new WordBoundary();
+				inv_step = 0;
 				break;
 
 			default:
@@ -110,7 +112,7 @@ namespace rex
 			}
 
 			if (invert)
-				return new InversionAtom(special);
+				return new InversionAtom(special, inv_step);
 			else
 				return special;
 		}
@@ -196,7 +198,7 @@ namespace rex
 
 						//Check if this is inverted
 						if (tok.originalText.size() > 1 && tok.originalText[1] == '^')
-							next = new InversionAtom(next);
+							next = new InversionAtom(next, 1);
 
 						break;
 					}

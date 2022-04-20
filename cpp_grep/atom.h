@@ -205,17 +205,19 @@ namespace rex
 	};
 
 	/// <summary>
-	/// Inverts the result of a SINGLE match atom only. Using this for atoms that match multiple chars will cause undefined behavior
+	/// Inverts the result of a SINGLE match atom only. Using this for atoms that match variable lengths of chars will cause undefined behavior
 	/// Currently this is broken and causes the program to hang... need to research this
 	/// </summary>
 	class InversionAtom : public Atom
 	{
 	private:
 		Atom* _atom;
+		int _step;
 	public:
-		InversionAtom(Atom* a)
+		InversionAtom(Atom* a, int step)
 		{
 			_atom = a;
+			_step = step;
 		}
 
 		int try_match(const string& str, size_t start_pos) override
@@ -227,7 +229,7 @@ namespace rex
 			if (r > -1)
 				return -1;
 
-			int fin = try_next(1, str, start_pos);
+			int fin = try_next(_step, str, start_pos);
 
 			return fin;
 		}
