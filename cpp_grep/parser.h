@@ -129,10 +129,10 @@ namespace rex
 
 					switch (tok.type)
 					{
-					case Token::Type::LITERAL:
+					case Token::LITERAL:
 						next = new CharLiteral(tok.value[0], caseSensitive);
 						break;
-					case Token::Type::CHAR_RANGE:
+					case Token::CHAR_RANGE:
 					{
 						unsigned char min = tok.value[0];
 						unsigned char max = tok.value[2];
@@ -173,22 +173,22 @@ namespace rex
 						}
 						break;
 					}
-					case Token::Type::CARRET:
+					case Token::CARRET:
 						next = new BeginLineAtom();
 						break;
-					case Token::Type::DOLLAR:
+					case Token::DOLLAR:
 						next = new EndLineAtom();
 						break;
-					case Token::Type::DOT:
+					case Token::DOT:
 						next = new AnyChar();
 						break;
-					case Token::Type::SPECIAL:
+					case Token::SPECIAL:
 						next = get_special(tok);
 						break;
 
-					case Token::Type::START_CHAR_CLASS:
+					case Token::START_CHAR_CLASS:
 					{
-						vector<Token> t = sub_seq(toks, i, Token::Type::END_CHAR_CLASS, false);
+						vector<Token> t = sub_seq(toks, i, Token::END_CHAR_CLASS, false);
 						if (t.empty())
 							continue;	//Ignore empty char classes
 
@@ -201,9 +201,9 @@ namespace rex
 						break;
 					}
 
-					case Token::Type::START_GROUP:
+					case Token::START_GROUP:
 					{
-						vector<Token> t = sub_seq(toks, i, Token::Type::END_GROUP, true);
+						vector<Token> t = sub_seq(toks, i, Token::END_GROUP, true);
 						
 						if (t.empty())
 						{
@@ -233,7 +233,7 @@ namespace rex
 						break;
 					}
 
-					case Token::Type::OR_OP:
+					case Token::OR_OP:
 						lastWasOr = true;
 						continue;	//Nothing to do
 
@@ -260,28 +260,28 @@ namespace rex
 
 						switch (t2.type)
 						{
-						case Token::Type::GREEDY_Q_MARK:
+						case Token::GREEDY_Q_MARK:
 							greedy = true;
-						case Token::Type::LAZY_Q_MARK:
+						case Token::LAZY_Q_MARK:
 							next = quantify(next, 0, 1, greedy);
 							i++;
 							break;
 
-						case Token::Type::GREEDY_STAR:
+						case Token::GREEDY_STAR:
 							greedy = true;
-						case Token::Type::LAZY_STAR:
+						case Token::LAZY_STAR:
 							next = quantify(next, 0, UINT32_MAX, greedy);	//TODO: Make no max a thing
 							i++;
 							break;
 
-						case Token::Type::GREEDY_PLUS:
+						case Token::GREEDY_PLUS:
 							greedy = true;
-						case Token::Type::LAZY_PLUS:
+						case Token::LAZY_PLUS:
 							next = quantify(next, 1, UINT32_MAX, greedy);	//TODO: Make no max a thing
 							i++;
 							break;
 
-						case Token::Type::STATIC_QUAN:
+						case Token::STATIC_QUAN:
 						{
 							unsigned int x;
 							istringstream(t2.value) >> x;	//TODO: Get a better way of parsing numbers
@@ -290,9 +290,9 @@ namespace rex
 							break;
 						}
 
-						case Token::Type::GREEDY_MIN_QUAN:
+						case Token::GREEDY_MIN_QUAN:
 							greedy = true;
-						case Token::Type::LAZY_MIN_QUAN:
+						case Token::LAZY_MIN_QUAN:
 						{
 							unsigned int x;
 							istringstream(t2.value) >> x;	//TODO: Get a better way of parsing numbers
@@ -301,9 +301,9 @@ namespace rex
 							break;
 						}
 
-						case Token::Type::GREEDY_RANGE_QUAN:
+						case Token::GREEDY_RANGE_QUAN:
 							greedy = true;
-						case Token::Type::LAZY_RANGE_QUAN:
+						case Token::LAZY_RANGE_QUAN:
 						{
 							unsigned int x, y;
 							size_t com = t2.value.find(',');

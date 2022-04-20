@@ -8,7 +8,7 @@ namespace rex
 {
 	using namespace std;
 
-	class Match : CaptureBase
+	class Match : public CaptureBase
 	{
 	private:
 		vector<Group> _groups;

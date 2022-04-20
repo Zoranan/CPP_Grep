@@ -14,3 +14,8 @@
 
 #define OPEN_CLASS_C '['
 #define CLOSE_CLASS_C ']'
+
+#ifndef UINT32_MAX
+#define UINT32_MAX 0xFFFFFFFF
+#endif
+

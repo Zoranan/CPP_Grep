@@ -44,7 +44,7 @@ namespace rex
 
 		Token()
 		{
-			type = Type::EMPTY;
+			type = EMPTY;
 			location = 0;
 			originalText = "";
 			value = "";
@@ -58,7 +58,7 @@ namespace rex
 
 		bool isQuan()
 		{
-			return type >= Type::GREEDY_PLUS && type <= Type::LAZY_RANGE_QUAN;
+			return type >= GREEDY_PLUS && type <= LAZY_RANGE_QUAN;
 		}
 
 		string toString()
@@ -66,73 +66,73 @@ namespace rex
 			string val("Type: ");
 			switch (type)
 			{
-			case Type::CARRET:
+			case CARRET:
 				val += "CARRET";
 				break;
-			case Type::CHAR_RANGE:
+			case CHAR_RANGE:
 				val += "CHAR_RANGE";
 				break;
-			case Type::DOLLAR:
+			case DOLLAR:
 				val += "DOLLAR";
 				break;
-			case Type::DOT:
+			case DOT:
 				val += "DOT";
 				break;
-			case Type::EMPTY:
+			case EMPTY:
 				val += "EMPTY";
 				break;
-			case Type::END_CHAR_CLASS:
+			case END_CHAR_CLASS:
 				val += "END_CHAR_CLASS";
 				break;
-			case Type::END_GROUP:
+			case END_GROUP:
 				val += "END_GROUP";
 				break;
-			case Type::GREEDY_PLUS:
+			case GREEDY_PLUS:
 				val += "GREEDY_PLUS";
 				break;
-			case Type::GREEDY_Q_MARK:
+			case GREEDY_Q_MARK:
 				val += "GREEDY_Q_MARK";
 				break;
-			case Type::GREEDY_STAR:
+			case GREEDY_STAR:
 				val += "GREEDY_STAR";
 				break;
-			case Type::LAZY_PLUS:
+			case LAZY_PLUS:
 				val += "LAZY_PLUS";
 				break;
-			case Type::LAZY_Q_MARK:
+			case LAZY_Q_MARK:
 				val += "LAZY_Q_MARK";
 				break;
-			case Type::LAZY_STAR:
+			case LAZY_STAR:
 				val += "LAZY_STAR";
 				break;
-			case Type::LITERAL:
+			case LITERAL:
 				val += "LITERAL";
 				break;
-			case Type::GREEDY_MIN_QUAN:
+			case GREEDY_MIN_QUAN:
 				val += "GREEDY_MIN_QUAN";
 				break;
-			case Type::LAZY_MIN_QUAN:
+			case LAZY_MIN_QUAN:
 				val += "LAZY_MIN_QUAN";
 				break;
-			case Type::OR_OP:
+			case OR_OP:
 				val += "OR_OP";
 				break;
-			case Type::GREEDY_RANGE_QUAN:
+			case GREEDY_RANGE_QUAN:
 				val += "GREEDY_RANGE_QUAN";
 				break;
-			case Type::LAZY_RANGE_QUAN:
+			case LAZY_RANGE_QUAN:
 				val += "LAZY_RANGE_QUAN";
 				break;
-			case Type::SPECIAL:
+			case SPECIAL:
 				val += "SPECIAL";
 				break;
-			case Type::START_CHAR_CLASS:
+			case START_CHAR_CLASS:
 				val += "START_CHAR_CLASS";
 				break;
-			case Type::START_GROUP:
+			case START_GROUP:
 				val += "START_GROUP";
 				break;
-			case Type::STATIC_QUAN:
+			case STATIC_QUAN:
 				val += "STATIC_QUAN";
 				break;
 
