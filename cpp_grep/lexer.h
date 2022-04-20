@@ -251,7 +251,8 @@ namespace rex
 				return true;
 
 			default:
-				tokOut.set_text(string(1, pattern[start]));
+				tokOut.originalText = pattern.substr(start - 1, 2);
+				tokOut.value = string(1, c);
 				tokOut.type = Token::LITERAL;
 				return false;
 			}
