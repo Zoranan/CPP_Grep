@@ -46,9 +46,16 @@ int process_matches(string& pattern, istream& stream, void (*func)(string&, Matc
 			}
 		}
 	}
-	catch (exception e)
+	catch (const RegexSyntaxException& reSyn)
 	{
-		cerr << e.what() << endl;
+		cerr << reSyn.what() << " at " << reSyn.at() << endl;
+		cerr << endl;
+		cerr << pattern << endl;
+		cerr << reSyn.get_indicator() << endl;
+	}
+	catch (const RegexException& reEx)
+	{
+		cerr << reEx.what() << endl;
 	}
 	catch (string s)
 	{

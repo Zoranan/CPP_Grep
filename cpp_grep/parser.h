@@ -2,6 +2,7 @@
 
 #include "token.h"
 #include "atom.h"
+#include "RegexException.h"
 
 namespace rex
 {
@@ -53,11 +54,11 @@ namespace rex
 				i++;
 
 				if (!allowNesting && balance > 1)
-					throw "Illegal nested pair at " + toStr(i - 1);
+					throw RegexSyntaxException("Illegal nested pair", i - 1);
 			}
 
 			if (balance != 0)
-				throw "Unbalanced pair at " + toStr(startIndex);
+				throw RegexSyntaxException("Unbalanced pair", startIndex);
 
 			return sub;
 		}
@@ -107,7 +108,7 @@ namespace rex
 				break;
 
 			default:
-				throw "Invalid escape sequence: '" + tok.originalText + "' at " + toStr(tok.location);
+				throw RegexSyntaxException("Invalid escape sequence '" + tok.originalText + "'", tok.location);
 				break;
 			}
 
@@ -209,7 +210,7 @@ namespace rex
 						
 						if (t.empty())
 						{
-							throw "Empty group at " + toStr(tok.location);
+							throw RegexSyntaxException("Empty group", tok.location);
 						}
 
 						//Check if this is a non-capturing group
@@ -240,7 +241,7 @@ namespace rex
 						continue;	//Nothing to do
 
 					default:
-						throw "Unsupported token ::: " + tok.toString();
+						throw RegexSyntaxException("Unsupported token '" + tok.originalText + "'", tok.location);
 						break;
 					}
 
@@ -343,11 +344,11 @@ namespace rex
 					return new OrAtom(ors);
 
 				else
-					throw "Something went horribly wrong";
+					throw RegexException("Something went horribly wrong");
 			
 			} // End try
 
-			catch (string x)
+			catch (const RegexException &x)
 			{
 				//Clean up memory
 				for (size_t i = 0; i < ors.size(); i++)
@@ -366,16 +367,8 @@ namespace rex
 		static Atom* parse(vector<Token> toks, bool caseSensistive)
 		{
 			unsigned short gNum = 1;	// The starting group number. Must be a var so it can be passed by ref
-			try 
-			{
-				Atom* inner = parse_inner(toks, caseSensistive, false, gNum);
-				return new RootAtom(inner);
-			}
-			catch (string err)
-			{
-				throw err;
-			}
-
+			Atom* inner = parse_inner(toks, caseSensistive, false, gNum);
+			return new RootAtom(inner);
 		}
 
 };

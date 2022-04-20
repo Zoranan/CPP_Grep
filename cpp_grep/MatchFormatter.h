@@ -120,7 +120,7 @@ namespace rex
 						}
 						else
 						{
-							throw "Invalid group reference at " + toStr(i) + ". Provide a group number followed by a closing '>', or escape the opening '<' with another one right before it";
+							throw FormatException("Invalid group reference. Provide a group number followed by a closing '>', or escape the opening '<' with another one right before it", i);
 						}
 
 					}

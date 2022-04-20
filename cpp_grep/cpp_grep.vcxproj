@@ -151,6 +151,7 @@
     <ClInclude Include="lexer.h" />
     <ClInclude Include="match.h" />
     <ClInclude Include="MatchFormatter.h" />
+    <ClInclude Include="RegexException.h" />
     <ClInclude Include="utils.h" />
     <ClInclude Include="parser.h" />
     <ClInclude Include="regex.h" />

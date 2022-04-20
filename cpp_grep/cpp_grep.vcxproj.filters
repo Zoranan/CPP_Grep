@@ -53,5 +53,8 @@
     <ClInclude Include="MatchFormatter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="RegexException.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

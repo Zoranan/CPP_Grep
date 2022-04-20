@@ -32,7 +32,7 @@ namespace rex
 				_pattern = Parser::parse(toks, caseSensitive);
 			}
 			else
-				throw "Regex pattern cannot be empty";
+				throw RegexException("Regex pattern cannot be empty");
 		}
 
 		string get_pattern()
@@ -50,7 +50,7 @@ namespace rex
 		bool matchAt(string &str, Match &out_match, size_t pos)
 		{
 			if (_pattern == nullptr)
-				throw "Regex was not initialized";
+				throw RegexException("Regex was not initialized");
 
 			int r = _pattern->try_match(str, pos);
 			if (r > 0)
@@ -87,7 +87,7 @@ namespace rex
 		vector<Match> matches(string& str, size_t start_pos = 0)
 		{
 			if (_pattern == nullptr)
-				throw "Regex was not initialized";
+				throw RegexException("Regex was not initialized");
 
 			vector<Match> res;
 			

@@ -3,6 +3,7 @@
 #include <vector>
 #include "capture.h"
 #include "group.h"
+#include "RegexException.h"
 
 namespace rex
 {
@@ -18,7 +19,7 @@ namespace rex
 		{
 			if (groupnum >= _groups.size())
 			{
-				throw "Group number is too high";
+				throw RegexException("Group number is too high");
 			}
 
 			return _groups[groupnum];

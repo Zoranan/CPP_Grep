@@ -2,7 +2,7 @@
 #include <string>
 #include <vector>
 #include "token.h"
-
+#include "RegexException.h"
 #include "defines.h"
 
 namespace rex
@@ -15,12 +15,12 @@ namespace rex
 			if (current.type != Token::EMPTY)
 			{
 				if (current.isQuan() && (toks.size() == 0 || toks[toks.size() - 1].isQuan()))
-					throw "Invalid quantifier at " + toStr(current.location + 1);
+					throw RegexSyntaxException("Invalid quantifier", current.location + 1);
 
 				toks.push_back(current);
 			}
 			else
-				throw "Attempted to add an empty token! " + current.toString();
+				throw RegexException("Attempted to add an empty token! " + current.toString());
 
 			current.originalText.erase();
 			current.value.erase();
@@ -136,7 +136,7 @@ namespace rex
 		static bool get_escaped_token(string& pattern, size_t start, Token& tokOut)
 		{
 			if (start >= pattern.length())
-				throw "Incomplete escape sequence at " + toStr(start);
+				throw RegexSyntaxException("Incomplete escape sequence", start);
 
 			tokOut.location = start;
 			char c = pattern[start];
@@ -172,10 +172,10 @@ namespace rex
 				unsigned char a;
 				unsigned char b;
 
-				if (start + 2 >= pattern.length() 
-					|| !read_hex_char(pattern[start + 1], a) 
+				if (start + 2 >= pattern.length()
+					|| !read_hex_char(pattern[start + 1], a)
 					|| !read_hex_char(pattern[start + 2], b))
-					throw "Invalid escape sequence at " + toStr(start) + ". Expected a 2 digit hex value";
+					throw RegexSyntaxException("Invalid escape sequence. Expected a 2 digit hex value", start);
 
 				tokOut.originalText = pattern.substr(start - 1, 4);
 				tokOut.value = string(1, a * 16 + b);
@@ -193,14 +193,14 @@ namespace rex
 				}
 
 				if (numstr.length() > 4 || numstr.length() == 0)	//Make sure at least 3 chars are left
-					throw "Invalid escape sequence at " + toStr(start) + ". Expected a 1-4 digit decimal character value";
+					throw RegexSyntaxException("Invalid escape sequence. Expected a 1-4 digit decimal character value", start);
 
 				int charVal;
 				istringstream istr(numstr);
 				istr >> charVal;
 
 				if (charVal < 0 || charVal > 255)
-					throw "Invalid character code at " + toStr(start) + ". Value must be between 0 and 255";
+					throw RegexSyntaxException("Invalid character code. Value must be between 0 and 255", start);
 
 				tokOut.originalText = pattern.substr(start - 1, 2 + numstr.length());
 				tokOut.value = string(1, static_cast<char>(charVal));
@@ -293,7 +293,7 @@ namespace rex
 				{
 					if (i == start)
 					{
-						throw "Invalid character class at: " + toStr(i);
+						throw RegexSyntaxException("Invalid character class", i);
 					}
 
 					tok.location = i;
@@ -328,7 +328,7 @@ namespace rex
 				{
 					// Check if the token is currently set to special. Character ranges can't be set to special
 					if (tok.type == Token::SPECIAL)
-						throw "Invalid character range at " + toStr(tok.location) + ". The special sequence '" + tok.originalText + "' cannot be used in a character range";
+						throw RegexSyntaxException("Invalid character range. The special sequence '" + tok.originalText + "' cannot be used in a character range", tok.location);
 
 					unsigned char minRange = tok.value[0];
 					unsigned char maxRange;
@@ -336,7 +336,7 @@ namespace rex
 					if (pattern[i] == '\\')
 					{
 						if (get_escaped_token(pattern, i + 1, tok))
-							throw "Invalid character range at " + toStr(i) + ". The special sequence '" + tok.originalText + "' cannot be used in a character range";
+							throw RegexSyntaxException("Invalid character range. The special sequence '" + tok.originalText + "' cannot be used in a character range", tok.location);
 
 						maxRange = tok.value[0];
 						i += tok.originalText.length();
@@ -348,7 +348,7 @@ namespace rex
 					}
 
 					if (minRange >= maxRange)
-						throw "Invalid character range at " + toStr(start) + ". Minimum value must be less than the maximum value";
+						throw RegexSyntaxException("Invalid character range. Minimum value must be less than the maximum value", start);
 
 					tok.originalText = pattern.substr(start, i - start - 1);
 					tok.value = string(1, minRange) + "-";
@@ -361,7 +361,7 @@ namespace rex
 			}
 
 			// We should have returned out by now
-			throw "Character class ended unexpectedly at: " + toStr(i);
+			throw RegexSyntaxException("Character class ended unexpectedly", i);
 		}
 
 	public:
@@ -423,7 +423,7 @@ namespace rex
 
 				case '|':
 					if (i == 0 || i == pattern.length() - 1 || (i < pattern.length() - 1 && pattern[i + 1] == '|'))
-						throw "Invalid location for OR (|) token: " + toStr(i);
+						throw RegexSyntaxException("Invalid location for OR (|) token", i);
 
 					tok.location = i;
 					tok.set_text("|");
