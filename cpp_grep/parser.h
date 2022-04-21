@@ -334,6 +334,7 @@ namespace rex
 				if (ors.size() == 0 || lastWasOr)
 				{
 					ors.add(next.release());
+					lastWasOr = false;
 				}
 				else
 				{
