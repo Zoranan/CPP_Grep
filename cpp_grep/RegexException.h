@@ -25,6 +25,8 @@ namespace rex
 		{
 			return _message.c_str();
 		}
+
+		virtual ~RegexException() throw() { }
 	};
 
 	class RegexSyntaxException : public RegexException
@@ -54,12 +56,16 @@ namespace rex
 			ind.push_back('^');
 			return ind;
 		}
+
+		virtual ~RegexSyntaxException() throw () { }
 	};
 
 	class FormatException : public RegexSyntaxException
 	{
 	public:
 		FormatException(string message, size_t err_pos) : RegexSyntaxException(message, err_pos) { }
+
+		virtual ~FormatException() throw() { }
 	};
 }
 

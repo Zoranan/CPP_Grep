@@ -421,12 +421,12 @@ namespace rex
 					end_token(tokens, tok);
 					break;
 
-				case '|':
-					if (i == 0 || i == pattern.length() - 1 || (i < pattern.length() - 1 && pattern[i + 1] == '|'))
-						throw RegexSyntaxException("Invalid location for OR (|) token", i);
+				case OR_OP_C:
+					if (i == 0 || i == pattern.length() - 1 || (i < pattern.length() - 1 && pattern[i + 1] == OR_OP_C))
+						throw RegexSyntaxException("Invalid location for OR token", i);
 
 					tok.location = i;
-					tok.set_text("|");
+					tok.set_text(OR_OP_STR);
 					tok.type = Token::OR_OP;
 					end_token(tokens, tok);
 					break;

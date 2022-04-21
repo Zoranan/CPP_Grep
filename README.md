@@ -1,6 +1,6 @@
 # CPP Grep
 
-A regex library written in C++
+A regex library written in C++, Compilable with C++98 (See below)
 
 
 ## Features
@@ -29,6 +29,15 @@ Capture groups are enclosed in parenthesis. If you don't want output to be captu
 - Groups can be nested and captures will be made for each
 - Capture groups are numbered in the order that their left parenthesis appear in
 
+
+## C++ 98 Compatability
+
+To compile this library for C++ 98, you will need to make sure the "defines.h" has the following two lines uncommented:
+
+```
+#define override
+#define nullptr 0
+```
 
 ## TODO
 
