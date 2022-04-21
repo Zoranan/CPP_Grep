@@ -56,5 +56,11 @@
     <ClInclude Include="RegexException.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SafeVector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UniquePtr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
