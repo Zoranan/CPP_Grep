@@ -47,7 +47,7 @@ namespace rex
 		}
 
 	public:
-		Atom(Atom* next = nullptr, unsigned char min_len = 0)
+		Atom(Atom* next = nullptr, unsigned int min_len = 0)
 		{
 			_next = next;
 			_min_length = min_len;
