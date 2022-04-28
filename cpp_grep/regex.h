@@ -15,6 +15,7 @@ namespace rex
 	private:
 		string _pattern_str;
 		Atom* _pattern;
+		unsigned int _minLen;
 
 	public:
 		Regex() 
@@ -30,6 +31,9 @@ namespace rex
 			{
 				vector<Token> toks = Lexer::lex(pattern);
 				_pattern = Parser::parse(toks, caseSensitive);
+				_minLen = _pattern->min_length();
+				if (_minLen > 0)
+					_minLen--;
 			}
 			else
 				throw RegexException("Regex pattern cannot be empty");
@@ -71,9 +75,7 @@ namespace rex
 		/// <returns></returns>
 		bool match(string& str, Match& out_match, size_t start_pos = 0)
 		{
-			unsigned int minLen = _pattern->min_length() - 1;
-
-			for (; start_pos < str.length() - minLen; start_pos++)
+			for (; start_pos + _minLen < str.length(); start_pos++)
 				if (matchAt(str, out_match, start_pos))
 					return true;
 			
@@ -92,8 +94,7 @@ namespace rex
 				throw RegexException("Regex was not initialized");
 
 			vector<Match> res;
-			unsigned int minLen = _pattern->min_length() - 1;
-			while (start_pos < str.length() - minLen)
+			while (start_pos + _minLen < str.length())
 			{
 				Match m;
 				if (matchAt(str, m, start_pos))
