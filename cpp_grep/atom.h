@@ -19,6 +19,7 @@ namespace rex
 
 	protected:
 		Atom* _next;
+		unsigned int _min_length;
 
 		/// <summary>
 		/// Try to match on our next atom (if it exists) and reset it if the match fails
@@ -46,9 +47,10 @@ namespace rex
 		}
 
 	public:
-		Atom(Atom* next = nullptr)
+		Atom(Atom* next = nullptr, unsigned char min_len = 0)
 		{
 			_next = next;
+			_min_length = min_len;
 		}
 
 		/// <summary>
@@ -62,6 +64,16 @@ namespace rex
 
 			else
 				_next->append(n);
+		}
+
+		virtual unsigned int min_length()
+		{
+			if (_next != nullptr)
+			{
+				return _next->min_length() + _min_length;
+			}
+			else
+				return _min_length;
 		}
 
 		/// <summary>
@@ -129,7 +141,7 @@ namespace rex
 			_caseSensitive = true;
 		}
 
-		CharLiteral(unsigned char c, bool caseSensitive = true, Atom* next = nullptr) : Atom(next)
+		CharLiteral(unsigned char c, bool caseSensitive = true, Atom* next = nullptr) : Atom(next, 1)
 		{
 			_char = !caseSensitive ? tolower_u(c) : c;
 			_caseSensitive = caseSensitive;
@@ -164,7 +176,7 @@ namespace rex
 		unsigned char _max;
 
 	public:
-		CharRange(unsigned char min, unsigned char max, Atom* next = nullptr) : Atom(next)
+		CharRange(unsigned char min, unsigned char max, Atom* next = nullptr) : Atom(next, 1)
 		{
 			_min = min;
 			_max = max;
@@ -214,7 +226,8 @@ namespace rex
 		Atom* _atom;
 		int _step;
 	public:
-		InversionAtom(Atom* a, int step)
+		InversionAtom() : Atom(nullptr, 1) { }
+		InversionAtom(Atom* a, int step) : Atom(nullptr, _step)
 		{
 			_atom = a;
 			_step = step;
@@ -261,6 +274,13 @@ namespace rex
 		OrAtom(vector<Atom*> a)
 		{
 			_atoms = a;
+			_min_length = _UI32_MAX;
+			for (size_t i = 0; i < _atoms.size(); i++)
+			{
+				unsigned int m = _atoms[i]->min_length();
+				if (m < _min_length)
+					_min_length = m;
+			}
 		}
 
 		void reset() override
@@ -333,8 +353,13 @@ namespace rex
 		unsigned int _min;
 		unsigned int _max;
 
+		unsigned int min_length() override
+		{
+			return (_atom->min_length() * _min) + Atom::min_length();
+		}
+
 	public:
-		QuantifierBase(Atom* a, unsigned int min, unsigned int max)
+		QuantifierBase(Atom* a, unsigned int min, unsigned int max) : Atom(nullptr, 0)
 		{
 			_atom = a;
 			_min = min;
@@ -485,6 +510,7 @@ namespace rex
 	class BeginStringAtom : public Atom
 	{
 	public:
+
 		int try_match(const string& str, size_t start_pos) override
 		{
 			if (start_pos == 0)
