@@ -227,7 +227,7 @@ namespace rex
 		int _step;
 	public:
 		InversionAtom() : Atom(nullptr, 1) { }
-		InversionAtom(Atom* a, int step) : Atom(nullptr, _step)
+		InversionAtom(Atom* a, int step) : Atom(nullptr, static_cast<unsigned int>(_step))
 		{
 			_atom = a;
 			_step = step;
@@ -274,7 +274,7 @@ namespace rex
 		OrAtom(vector<Atom*> a)
 		{
 			_atoms = a;
-			_min_length = _UI32_MAX;
+			_min_length = UINT32_MAX;
 			for (size_t i = 0; i < _atoms.size(); i++)
 			{
 				unsigned int m = _atoms[i]->min_length();
