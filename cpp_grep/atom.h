@@ -19,6 +19,7 @@ namespace rex
 
 	protected:
 		Atom* _next;
+		Atom* _previous;	// No need to delete, just another reference
 		unsigned int _min_length;
 
 		/// <summary>
@@ -60,7 +61,10 @@ namespace rex
 		void append(Atom* n)
 		{
 			if (_next == nullptr)
+			{
 				_next = n;
+				n->_previous = this;
+			}
 
 			else
 				_next->append(n);
