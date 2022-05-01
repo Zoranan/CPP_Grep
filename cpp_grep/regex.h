@@ -51,9 +51,9 @@ namespace rex
 		/// <param name="out_match">The Match object to hold the results</param>
 		/// <param name="pos">The position to match at</param>
 		/// <returns>True if the match succeeds, false otherwise</returns>
-		bool matchAt(string &str, Match &out_match, size_t pos)
+		bool matchAt(const char * str, size_t strSize, Match &out_match, size_t pos)
 		{
-			int r = _pattern->try_match(str, pos);
+			int r = _pattern->try_match(str, strSize, pos);
 			if (r > 0)
 			{
 				_pattern->commit(out_match, str);
@@ -70,11 +70,14 @@ namespace rex
 		/// <param name="out_match">The Match object to hold the results</param>
 		/// <param name="The position in the string to start checking at"></param>
 		/// <returns></returns>
-		bool match(string& str, Match& out_match, size_t start_pos = 0)
+		bool match(const char *str, size_t strSize, Match& out_match, size_t start_pos = 0)
 		{
-			for (; start_pos + _minLen < str.length(); start_pos++)
-				if (matchAt(str, out_match, start_pos))
+			for (; start_pos + _minLen < strSize; start_pos++)
+			{
+				_pattern->reset();
+				if (matchAt(str, strSize, out_match, start_pos))
 					return true;
+			}
 			
 			return false;
 		}
@@ -85,13 +88,13 @@ namespace rex
 		/// <param name="str">The string to match</param>
 		/// <param name="The position in the string to start checking at"></param>
 		/// <returns>A vector of matches made</returns>
-		vector<Match> matches(string& str, size_t start_pos = 0)
+		vector<Match> matches(char *str, size_t strSize, size_t start_pos = 0)
 		{
 			vector<Match> res;
-			while (start_pos + _minLen < str.length())
+			while (start_pos + _minLen < strSize)
 			{
 				Match m;
-				if (matchAt(str, m, start_pos))
+				if (matchAt(str, strSize, m, start_pos))
 				{
 					res.push_back(m);
 					size_t len = m.get_group(0).length();

@@ -37,7 +37,7 @@ int process_matches(string& pattern, istream& stream, void (*func)(string&, Matc
 		{
 			//Line was read, now see if it matches our pattern
 			Match m;
-			if (reg.match(line, m))
+			if (reg.match(line.data(), line.size(), m))
 			{
 				count++;
 				lineNum++;

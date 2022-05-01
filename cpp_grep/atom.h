@@ -30,14 +30,14 @@ namespace rex
 		/// <param name="str">The string we are matching against</param>
 		/// <param name="start_pos">The position this atom started at (not including its current result</param>
 		/// <returns>The result of all downstream atoms</returns>
-		int try_next(int current_result, const string& str, size_t start_pos)
+		int try_next(int current_result, const char* str, size_t strSize, size_t start_pos)
 		{
 			if (_next == nullptr)
 			{
 				return current_result;
 			}
 
-			int nextRes = _next->try_match(str, start_pos + current_result);
+			int nextRes = _next->try_match(str, strSize, start_pos + current_result);
 			if (nextRes > -1)
 			{
 				return current_result + nextRes;
@@ -115,7 +115,7 @@ namespace rex
 		/// <param name="str">The input string to match against</param>
 		/// <param name="start_pos">The position in the string to match against</param>
 		/// <returns>The number of characters this and all downstream atoms traveled, or -1 for failures.</returns>
-		virtual int try_match(const string& str, size_t start_pos) = 0;
+		virtual int try_match(const char* str, size_t strSize, size_t start_pos) = 0;
 
 		virtual ~Atom()
 		{
@@ -151,9 +151,9 @@ namespace rex
 			_caseSensitive = caseSensitive;
 		}
 
-		int try_match(const string& str, size_t start_pos) override
+		int try_match(const char* str, size_t strSize, size_t start_pos) override
 		{
-			if (start_pos >= str.size())
+			if (start_pos >= strSize)
 				return -1;
 			
 			unsigned char c = static_cast<unsigned char>(str[start_pos]);
@@ -163,7 +163,7 @@ namespace rex
 			// This atom succeeded
 			if (c == _char)
 			{
-				return try_next(1, str, start_pos);
+				return try_next(1, str, strSize, start_pos);
 			}
 
 			return -1;
@@ -186,9 +186,9 @@ namespace rex
 			_max = max;
 		}
 
-		int try_match(const string& str, size_t start_pos) override
+		int try_match(const char* str, size_t strSize, size_t start_pos) override
 		{
-			if (start_pos >= str.size())
+			if (start_pos >= strSize)
 				return -1;
 
 			unsigned char c = str[start_pos];
@@ -196,7 +196,7 @@ namespace rex
 			//This Atom succeeded
 			if (_min <= c && c <= _max)
 			{
-				return try_next(1, str, start_pos);
+				return try_next(1, str, strSize, start_pos);
 			}
 
 			// All success branches should have returned out by now. If we're here, then this Atom or one of its sub atoms failed
@@ -209,11 +209,11 @@ namespace rex
 	/// </summary>
 	class AnyChar : public Atom
 	{
-		int try_match(const string& str, size_t start_pos) override
+		int try_match(const char* str, size_t strSize, size_t start_pos) override
 		{
-			if (start_pos < str.size())
+			if (start_pos < strSize)
 			{
-				return try_next(1, str, start_pos);
+				return try_next(1, str, strSize, start_pos);
 			}
 
 			return -1;
@@ -230,23 +230,27 @@ namespace rex
 		Atom* _atom;
 		int _step;
 	public:
-		InversionAtom() : Atom(nullptr, 1) { }
+		InversionAtom() : Atom(nullptr, 1) 
+		{ 
+			_atom = nullptr; 
+			_step = 1;
+		}
 		InversionAtom(Atom* a, int step) : Atom(nullptr, static_cast<unsigned int>(_step))
 		{
 			_atom = a;
 			_step = step;
 		}
 
-		int try_match(const string& str, size_t start_pos) override
+		int try_match(const char * str, size_t strSize, size_t start_pos) override
 		{
-			if (start_pos >= str.size())
+			if (start_pos >= strSize)
 				return -1;
 
-			int r = _atom->try_match(str, start_pos);
+			int r = _atom->try_match(str, strSize, start_pos);
 			if (r > -1)
 				return -1;
 
-			int fin = try_next(_step, str, start_pos);
+			int fin = try_next(_step, str, strSize, start_pos);
 
 			return fin;
 		}
@@ -308,16 +312,16 @@ namespace rex
 			Atom::commit(m, str);
 		}
 
-		int try_match(const string& str, size_t start_pos) override
+		int try_match(const char* str, size_t strSize, size_t start_pos) override
 		{
 			for (size_t i = 0; i < _atoms.size(); i++)
 			{
-				int r = _atoms[i]->try_match(str, start_pos);
+				int r = _atoms[i]->try_match(str, strSize, start_pos);
 
 				// This branch of the or succeeded
 				if (r > -1)
 				{
-					int fin = try_next(r, str, start_pos);	//_next is auto reset on failure with this call
+					int fin = try_next(r, str, strSize, start_pos);	//_next is auto reset on failure with this call
 					if (fin > -1)
 					{
 						return fin;
@@ -397,7 +401,7 @@ namespace rex
 	public:
 		GreedyQuantifier(Atom* a, unsigned int min, unsigned int max) : QuantifierBase(a, min, max) { }
 
-		int try_match(const string& str, size_t start_pos) override
+		int try_match(const char* str, size_t strSize, size_t start_pos) override
 		{
 			// First, get the maximum start_pos that our inner atom could match, so we can work our way backwards
 			stack<size_t> end_positions;
@@ -407,7 +411,7 @@ namespace rex
 
 			while (end_positions.size() <= _max)
 			{
-				int r = _atom->try_match(str, last_end_pos);
+				int r = _atom->try_match(str, strSize, last_end_pos);
 				if (r > -1)
 				{
 					last_end_pos += r;
@@ -428,7 +432,7 @@ namespace rex
 
 			// We found the most greedy match possible and met the minimum
 			// If we don't have a next, then return success
-			int fin = try_next(static_cast<int>(end_positions.top() - start_pos), str, start_pos);	//NOTE: Always pass in the unmodified start position, because this method adds the current position to it!
+			int fin = try_next(static_cast<int>(end_positions.top() - start_pos), str, strSize, start_pos);	//NOTE: Always pass in the unmodified start position, because this method adds the current position to it!
 			
 			if (_next != nullptr)
 				while (fin == -1)
@@ -441,7 +445,7 @@ namespace rex
 					end_positions.pop();
 					_atom->pop_state();	//Step this atom's memory back once (only apply's if its a capture group)
 
-					fin = try_next(static_cast<int>(end_positions.top() - start_pos), str, start_pos);
+					fin = try_next(static_cast<int>(end_positions.top() - start_pos), str, strSize, start_pos);
 				}
 
 			if (fin == -1)
@@ -460,7 +464,7 @@ namespace rex
 	public:
 		LazyQuantifier(Atom* a, unsigned int min, unsigned int max) : QuantifierBase(a, min, max) {}
 
-		int try_match(const string& str, size_t start_pos) override
+		int try_match(const char* str, size_t strSize, size_t start_pos) override
 		{
 			if (_max <= 0)
 				return -1;
@@ -474,7 +478,7 @@ namespace rex
 				//If we've done the minimum matching needed, check our next atom and return out if success
 				if (c >= _min)
 				{
-					int fin = try_next(i, str, start_pos);	//_next is auto reset here on failure
+					int fin = try_next(i, str, strSize, start_pos);	//_next is auto reset here on failure
 					if (fin > -1)
 					{
 						return fin;
@@ -489,7 +493,7 @@ namespace rex
 
 				// We have not reached max yet, try our inner atom again
 
-				r = _atom->try_match(str, start_pos + i);
+				r = _atom->try_match(str, strSize, start_pos + i);
 				if (r > -1)
 				{
 					c++;
@@ -515,10 +519,10 @@ namespace rex
 	{
 	public:
 
-		int try_match(const string& str, size_t start_pos) override
+		int try_match(const char* str, size_t strSize, size_t start_pos) override
 		{
 			if (start_pos == 0)
-				return try_next(0, str, start_pos);
+				return try_next(0, str, strSize, start_pos);
 
 			return -1;
 		}
@@ -530,10 +534,10 @@ namespace rex
 	class EndStringAtom : public Atom
 	{
 	public:
-		int try_match(const string& str, size_t start_pos) override
+		int try_match(const char* str, size_t strSize, size_t start_pos) override
 		{
-			if (start_pos == str.size())
-				return try_next(0, str, start_pos);
+			if (start_pos == strSize)
+				return try_next(0, str, strSize, start_pos);
 
 			return -1;
 		}
@@ -545,13 +549,13 @@ namespace rex
 	class BeginLineAtom : public Atom
 	{
 	public:
-		int try_match(const string& str, size_t start_pos) override
+		int try_match(const char * str, size_t strSize, size_t start_pos) override
 		{
 			if (start_pos == 0
-				|| (start_pos - 1 < str.length() && str[start_pos - 1] == '\n')
+				|| (start_pos - 1 < strSize && str[start_pos - 1] == '\n')
 				//|| (start_pos + 1 < str.length() && str[start_pos + 1] == '\r')
 				)
-				return try_next(0, str, start_pos);
+				return try_next(0, str, strSize, start_pos);
 
 			return -1;
 		}
@@ -563,12 +567,10 @@ namespace rex
 	class EndLineAtom : public Atom
 	{
 	public:
-		int try_match(const string& str, size_t start_pos) override
+		int try_match(const char* str, size_t strSize, size_t start_pos) override
 		{
-			size_t s = str.size();
-
-			if (start_pos >= s || (start_pos + 1 < s && (str[start_pos + 1] == '\n' || str[start_pos + 1] == '\r')))
-				return try_next(0, str, start_pos);
+			if (start_pos >= strSize || (start_pos + 1 < strSize && (str[start_pos + 1] == '\n' || str[start_pos + 1] == '\r')))
+				return try_next(0, str, strSize, start_pos);
 
 			return -1;
 		}
@@ -583,7 +585,7 @@ namespace rex
 		}
 
 	public:
-		int try_match(const string& str, size_t start_pos) override
+		int try_match(const char * str, size_t strSize, size_t start_pos) override
 		{
 			bool is1aWord = false;
 			bool is2aWord = false;
@@ -591,11 +593,11 @@ namespace rex
 			if (start_pos > 0)
 				is1aWord = is_word_char(str[start_pos - 1]);
 
-			if (start_pos < str.length())
+			if (start_pos < strSize)
 				is2aWord = is_word_char(str[start_pos]);
 
 			if (is1aWord != is2aWord)
-				return try_next(0, str, start_pos);
+				return try_next(0, str, strSize, start_pos);
 
 			return -1;
 		}
@@ -681,11 +683,11 @@ namespace rex
 			Atom::commit(m, str);
 		}
 
-		int try_match(const string& str, size_t start_pos) override
+		int try_match(const char* str, size_t strSize, size_t start_pos) override
 		{
 			// Place down a starting capture point and try the next atom
 			_pendingCaps.push_back(PendingCap(start_pos, 0));
-			int r = try_next(0, str, start_pos);
+			int r = try_next(0, str, strSize, start_pos);
 			
 			// If it failed somewhere down the line, pop that capture back off
 			if (r < 0)
@@ -712,47 +714,14 @@ namespace rex
 			_start = start;
 		}
 
-		int try_match(const string& str, size_t start_pos) override
+		int try_match(const char * str, size_t strSize, size_t start_pos) override
 		{
-			int r = try_next(0,str, start_pos);
+			int r = try_next(0,str, strSize, start_pos);
 
 			if (r > -1)
 				_start->end_capture(start_pos);
 
 			return r;
-		}
-	};
-
-	//////////////////////
-	//	ROOT Atom
-	//////////////////////
-
-	/// <summary>
-	/// The root nod of the regex.
-	/// </summary>
-	class RootAtom : public Atom
-	{
-
-	public:
-		RootAtom(Atom* innerRoot)
-		{
-			// Create a start that will track the total match
-			GroupStart* start = new GroupStart(0, innerRoot);
-			
-			// Create our end, and give it a pointer to where our start is
-			GroupEnd* end = new GroupEnd(start);
-
-			// Place our end atom at the end of the start
-			start->append(end);
-
-			// Set the start as our next
-			_next = start;
-		}
-
-		int try_match(const string& str, size_t start_pos) override
-		{
-			reset();
-			return try_next(0, str, start_pos);
 		}
 	};
 }

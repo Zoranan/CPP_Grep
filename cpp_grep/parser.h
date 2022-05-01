@@ -366,7 +366,17 @@ namespace rex
 		{
 			unsigned short gNum = 1;	// The starting group number. Must be a var so it can be passed by ref
 			Atom* inner = parse_inner(toks, caseSensistive, false, gNum);
-			return new RootAtom(inner);
+
+			GroupStart* start = new GroupStart(0, inner);
+
+			// Create our end, and give it a pointer to where our start is
+			GroupEnd* end = new GroupEnd(start);
+
+			// Place our end atom at the end of the start
+			start->append(end);
+
+
+			return start;
 		}
 
 };
