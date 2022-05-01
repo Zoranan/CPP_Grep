@@ -19,7 +19,6 @@ namespace rex
 
 	protected:
 		Atom* _next;
-		Atom* _previous;	// No need to delete, just another reference
 		unsigned int _min_length;
 
 		/// <summary>
@@ -51,19 +50,17 @@ namespace rex
 		{
 			_next = next;
 			_min_length = min_len;
-			_previous = nullptr;
 		}
 
 		/// <summary>
 		/// Recursively append 'n' to the last atom in the sequence
 		/// </summary>
 		/// <param name="n">A pointer to the Atom to append</param>
-		void append(Atom* n)
+		virtual void append(Atom* n)
 		{
 			if (_next == nullptr)
 			{
 				_next = n;
-				n->_previous = this;
 			}
 
 			else
@@ -250,7 +247,7 @@ namespace rex
 	{
 	private:
 		vector<Atom*> _atoms;
-		vector<vector<unsigned short>> _branch_groups;
+		//vector<vector<unsigned short>> _branch_groups;
 
 	protected:
 		OrAtom(Atom* next = nullptr) : Atom(next) {}
@@ -270,8 +267,26 @@ namespace rex
 
 				vector<unsigned short> grps;
 				_atoms[i]->findGroupNums(grps);
-				_branch_groups.push_back(grps);
 			}
+		}
+
+		void append(Atom* next) override
+		{
+			// Only append next to each branch if this is the first Atom after the OR.
+			if (_next == nullptr)
+			{
+				for (size_t i = 0; i < _atoms.size(); i++)
+				{
+					_atoms[i]->append(next);
+				}
+
+				_next = next;
+			}
+			else
+			{
+				_next->append(next);
+			}
+			
 		}
 
 		int try_match(const char* str, size_t strSize, size_t start_pos, MatchState& state) override
@@ -280,28 +295,11 @@ namespace rex
 			{
 				int r = _atoms[i]->try_match(str, strSize, start_pos, state);
 
-				// This branch of the or succeeded
+				// This branch succeeded
 				if (r > -1)
 				{
-					int fin = try_next(r, str, strSize, start_pos, state);	//_next is auto reset on failure with this call
-					if (fin > -1)
-					{
-						return fin;
-					}
-					else
-					{
-						for (size_t j = 0; j < _branch_groups[i].size(); j++)
-						{
-							state.resetGroup(_branch_groups[i][j]);	//The part after this branch failed, so reset this branch
-						}
-					}
+					return r;
 				}
-
-				//This branch failed, so reset it
-				//else
-				//{
-				//	_atoms[i]->reset(); // Branch should be resetting itself, so this is uneeded
-				//}
 			}
 
 			// No branches succeeded
