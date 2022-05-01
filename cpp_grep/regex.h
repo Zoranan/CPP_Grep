@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include "match.h"
+#include "MatchState.h"
 #include "atom.h"
 #include "utils.h"
 #include "lexer.h"
@@ -16,12 +16,15 @@ namespace rex
 		string _pattern_str;
 		Atom* _pattern;
 		unsigned int _minLen;
+		unsigned short _numGroups;
+		MatchState _state;
 
 	public:
 		Regex() 
 		{
 			_pattern_str = "";
 			_pattern = nullptr;
+			_numGroups = 1;
 		}
 
 		Regex(string pattern, bool caseSensitive = true)
@@ -30,7 +33,8 @@ namespace rex
 			if (pattern.size() > 0)
 			{
 				vector<Token> toks = Lexer::lex(pattern);
-				_pattern = Parser::parse(toks, caseSensitive);
+				_pattern = Parser::parse(toks, caseSensitive, _numGroups);
+				_state = MatchState(_numGroups);
 				_minLen = _pattern->min_length();
 				if (_minLen > 0)
 					_minLen--;
@@ -51,12 +55,12 @@ namespace rex
 		/// <param name="out_match">The Match object to hold the results</param>
 		/// <param name="pos">The position to match at</param>
 		/// <returns>True if the match succeeds, false otherwise</returns>
-		bool matchAt(const char * str, size_t strSize, Match &out_match, size_t pos)
+		bool matchAt(const char * str, size_t strSize, Match &out_match, size_t pos, MatchState &state)
 		{
-			int r = _pattern->try_match(str, strSize, pos);
+			int r = _pattern->try_match(str, strSize, pos, state);
 			if (r > 0)
 			{
-				_pattern->commit(out_match, str);
+				state.commit(out_match, str);	// Commit will reset the state object
 				return true;
 			}
 			
@@ -72,10 +76,10 @@ namespace rex
 		/// <returns></returns>
 		bool match(const char *str, size_t strSize, Match& out_match, size_t start_pos = 0)
 		{
+			//MatchState state(_numGroups);
 			for (; start_pos + _minLen < strSize; start_pos++)
 			{
-				_pattern->reset();
-				if (matchAt(str, strSize, out_match, start_pos))
+				if (matchAt(str, strSize, out_match, start_pos, _state))
 					return true;
 			}
 			
@@ -91,10 +95,11 @@ namespace rex
 		vector<Match> matches(char *str, size_t strSize, size_t start_pos = 0)
 		{
 			vector<Match> res;
+			//MatchState state(_numGroups);
 			while (start_pos + _minLen < strSize)
 			{
 				Match m;
-				if (matchAt(str, strSize, m, start_pos))
+				if (matchAt(str, strSize, m, start_pos, _state))
 				{
 					res.push_back(m);
 					size_t len = m.get_group(0).length();

@@ -18,6 +18,9 @@
     <ClCompile Include="cpp_grep.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MatchState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="regex.h">
@@ -60,6 +63,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="UniquePtr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MatchState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

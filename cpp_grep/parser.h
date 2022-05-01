@@ -233,10 +233,11 @@ namespace rex
 						unsigned short captureGroup = gNum;	//Store off our capture group before it gets incremented
 						gNum++;
 
+						next.replace(parse_inner(t, caseSensitive, false, gNum));
 						// Create the group start with the inner part of the group attached
-						UniquePtr<GroupStart*> start(new GroupStart(captureGroup, parse_inner(t, caseSensitive, false, gNum)));
+						UniquePtr<GroupStart*> start(new GroupStart(captureGroup, next.get()));
 						//Create an end group atom with a reference to the start atom, the attach the end to the start;
-						start.get()->append(new GroupEnd(start.get()));
+						start.get()->append(new GroupEnd(captureGroup));
 
 						next.replace(start.release());
 					}
@@ -362,17 +363,14 @@ namespace rex
 		}//End parse_inner
 		
 	public:
-		static Atom* parse(vector<Token> toks, bool caseSensistive)
+		static Atom* parse(vector<Token> toks, bool caseSensistive, unsigned short &num_groups)
 		{
-			unsigned short gNum = 1;	// The starting group number. Must be a var so it can be passed by ref
-			Atom* inner = parse_inner(toks, caseSensistive, false, gNum);
+			num_groups = 1;	// The starting group number is one, so that we can use group 0 for the whole match.
+							// This var gets reused as an out var
+			Atom* inner = parse_inner(toks, caseSensistive, false, num_groups);
 
 			GroupStart* start = new GroupStart(0, inner);
-
-			// Create our end, and give it a pointer to where our start is
-			GroupEnd* end = new GroupEnd(start);
-
-			// Place our end atom at the end of the start
+			GroupEnd* end = new GroupEnd(0);
 			start->append(end);
 
 

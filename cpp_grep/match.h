@@ -4,6 +4,7 @@
 #include "capture.h"
 #include "group.h"
 #include "RegexException.h"
+#include <iostream>
 
 namespace rex
 {

@@ -142,6 +142,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="cpp_grep.cpp" />
+    <ClCompile Include="MatchState.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="atom.h" />
@@ -151,6 +152,7 @@
     <ClInclude Include="lexer.h" />
     <ClInclude Include="match.h" />
     <ClInclude Include="MatchFormatter.h" />
+    <ClInclude Include="MatchState.h" />
     <ClInclude Include="RegexException.h" />
     <ClInclude Include="SafeVector.h" />
     <ClInclude Include="UniquePtr.h" />
