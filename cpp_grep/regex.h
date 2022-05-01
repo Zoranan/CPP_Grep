@@ -55,12 +55,12 @@ namespace rex
 		/// <param name="out_match">The Match object to hold the results</param>
 		/// <param name="pos">The position to match at</param>
 		/// <returns>True if the match succeeds, false otherwise</returns>
-		bool matchAt(const char * str, size_t strSize, Match &out_match, size_t pos, MatchState &state)
+		bool matchAt(const char * str, size_t strSize, Match &out_match, size_t pos)
 		{
-			int r = _pattern->try_match(str, strSize, pos, state);
+			int r = _pattern->try_match(str, strSize, pos, _state);
 			if (r > 0)
 			{
-				state.commit(out_match, str);	// Commit will reset the state object
+				_state.commit(out_match, str);	// Commit will reset the state object
 				return true;
 			}
 			
@@ -76,10 +76,9 @@ namespace rex
 		/// <returns></returns>
 		bool match(const char *str, size_t strSize, Match& out_match, size_t start_pos = 0)
 		{
-			//MatchState state(_numGroups);
 			for (; start_pos + _minLen < strSize; start_pos++)
 			{
-				if (matchAt(str, strSize, out_match, start_pos, _state))
+				if (matchAt(str, strSize, out_match, start_pos))
 					return true;
 			}
 			
@@ -95,11 +94,10 @@ namespace rex
 		vector<Match> matches(char *str, size_t strSize, size_t start_pos = 0)
 		{
 			vector<Match> res;
-			//MatchState state(_numGroups);
 			while (start_pos + _minLen < strSize)
 			{
 				Match m;
-				if (matchAt(str, strSize, m, start_pos, _state))
+				if (matchAt(str, strSize, m, start_pos))
 				{
 					res.push_back(m);
 					size_t len = m.get_group(0).length();
