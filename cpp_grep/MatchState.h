@@ -34,13 +34,12 @@ namespace rex
 			}
 		};
 
-		struct PendingCap;
-		vector<vector<PendingCap>> _groupCaps;
+		vector<vector<PendingCap> > _groupCaps;
 
 	public:
 		MatchState(unsigned short groupCount = 1)
 		{
-			_groupCaps = vector<vector<PendingCap>>(groupCount);
+			_groupCaps = vector<vector<PendingCap> >(groupCount);
 		}
 
 		void startNewCapture(unsigned short group, size_t startPos);
